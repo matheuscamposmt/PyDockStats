@@ -43,4 +43,4 @@ def load_file(file) -> pd.DataFrame:
         return pd.read_csv(_read_lst(file), sep=',')
 
               
-    return pd.read_csv(file, engine='python')
+    return pd.read_csv(file,sep=None, engine='python')
