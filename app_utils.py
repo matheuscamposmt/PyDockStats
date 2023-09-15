@@ -34,11 +34,11 @@ def upload_files(program_name):
     with col1:
         st.markdown("#### Ligands")
         ligands_file = st.file_uploader("Choose a .csv or .lst file for the ligands", 
-                                        type=['csv', 'lst'], key=f"{program_name}_ligands")
+                                        type=['csv', 'lst', 'xlsx'], key=f"{program_name}_ligands")
     with col2:
         st.markdown("#### Decoys")
         decoys_file = st.file_uploader("Choose a .csv or .lst file for the decoys", 
-                                    type=['csv', 'lst'], key=f"{program_name}_decoys")
+                                    type=['csv', 'lst', 'xslx'], key=f"{program_name}_decoys")
     return ligands_file, decoys_file
 
 # Function to display data preview
