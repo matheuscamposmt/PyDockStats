@@ -49,13 +49,20 @@ def display_data_preview(df):
 # Function to plot curves
 def plot_curve(fig, program_name, curve_data, curve_name):
     x, y = curve_data['x'], curve_data['y']
+    auc = curve_data['auc']
+    text_legend = f"{program_name} | AUC={auc:.2f}" if curve_name == "ROC" else f"{program_name}"
+
+    hover_template = 'FPR: %{x}<br>TPR: %{y}<br>' if curve_name == "ROC" else 'Quantile: %{x}<br>Activity probability: %{y}<br>'
     fig.add_trace(
         go.Scatter(
-                  x=x, y=y, mode='lines', 
-                  name=f"{program_name} {curve_name}", 
-                  line=dict(width=3), showlegend=True
+            x=x, y=y, mode='lines', 
+            name=text_legend, 
+            line=dict(width=3), showlegend=True,
+            hovertemplate=hover_template
         )
     )
+    
+
 
 # Function to save Plotly figures as images
 def save_plotly_figures_as_images(figures):

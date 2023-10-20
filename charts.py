@@ -2,11 +2,12 @@ import streamlit as st
 from pydockstats import generate_plots
 from app_utils import plot_curve
 import plotly.graph_objects as go
-
 def _generate_curves(program_name):
     scores, activity = st.session_state.data[program_name]['scores'], st.session_state.data[program_name]['activity']
     pc_data, roc_data = generate_plots(program_name, scores, activity)
     return pc_data, roc_data
+
+
 
 def generate_charts():
     st.header("Charts")
@@ -17,16 +18,22 @@ def generate_charts():
     # Plot the PC and the ROC
     st.subheader("Predictiveness Curve")
     pc_container = st.container()
-    fig_pc = go.Figure(layout=dict(title=dict(text="PC"), xaxis_title="Quantile", yaxis_title="Activity probability",
-                                    legend=dict(orientation="h"), height=600, width=1000, font_family="Overpass", font_size=25),
-                                    )
-    
+    fig_pc = go.Figure(layout=dict(title=dict(text="PC", font=dict(size=20)), xaxis_title="Quantile", yaxis_title="Activity probability",
+                                    legend=dict(orientation="v"), height=600, width=1000, font=dict(family='Montserrat', size=16), legend_title_text="Programs"))
+    fig_pc.update_xaxes(range=[0, 1], constrain='domain', showgrid=False)
+    fig_pc.update_yaxes(range=[0, 1], constrain='domain', showgrid=False)
 
-    st.subheader("ROC (Receiver Operating Characteristic)")
+
+    
+    
+    st.subheader("Receiver Operating Characteristic")
     roc_container = st.container()
-    fig_roc = go.Figure(layout=dict(title=dict(text="ROC"), xaxis_title="False Positive Rate", 
-                                    yaxis_title="True Positive Rate", legend=dict(orientation="h"), height=600, width=900,
-                                    font_family="Overpass", font_size=25))
+    fig_roc = go.Figure(layout=dict(title=dict(text="ROC", font=dict(size=20)), xaxis_title="False Positive Rate", 
+                                    yaxis_title="True Positive Rate", legend=dict(orientation="v"), height=600, width=900,
+                                    font=dict(family='Montserrat', size=16), legend_title_text="Programs"))
+    fig_roc.update_xaxes(range=[0, 1], constrain='domain', showgrid=False)
+    fig_roc.update_yaxes(range=[0, 1], constrain='domain', showgrid=False)
+
     
     
     if option == 'All':
