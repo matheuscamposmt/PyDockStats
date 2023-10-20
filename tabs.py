@@ -50,7 +50,7 @@ def _program_tab_content(program_name):
                                                 )
                                                 })
         decoys_df = decoy_data_editor
-        
+    """   
     upload_space = st.expander("Upload Files", expanded=False)
     with upload_space:
         # Upload files and display data preview
@@ -58,6 +58,7 @@ def _program_tab_content(program_name):
         if ligands_file or decoys_file:
             ligands_df = load_file(ligands_file)
             decoys_df = load_file(decoys_file)
+    """ 
 
     generate_button = st.button("Generate", key=f"generate_{program_name}_tab", 
                                 use_container_width=True, type='primary', help="Generate the performance metric figures")

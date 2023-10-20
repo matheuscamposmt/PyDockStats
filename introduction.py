@@ -23,10 +23,11 @@ def helper():
     with st.expander("How to use"):
         st.markdown("""
                     With PyDockStats you can add as many programs as you want using the **"Add Program"** button below.
-                    In each program tab you:
-                    1. Upload the ligands and decoys scores.
-                    2. The data preview will be displayed below.
-                    3. The PC and ROC curves will be displayed below.
-                    4. You can download the figures by clicking on the download button below.
-                    5. You can send the figures to an email by clicking on the send button below.
+                    
+                    In each program tab you can:
+                    1. Paste the scores of the ligands and decoys in the data editor.
+                    2. Preview the data to ensure it is correct.
+                    3. View the PC and ROC curves generated from the data.
+                    4. Download the figures by clicking on the download button below the charts.
+                    5. Send the figures to an email.
                     """)
