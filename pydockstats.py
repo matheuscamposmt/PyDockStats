@@ -9,7 +9,7 @@ from putils import scale, num_derivative, find_nearest, read_result_file
 
 # Constants
 FORMATS = {"csv": pd.read_csv, "excel": pd.read_excel}
-MODEL = LogisticRegression(solver="lbfgs", penalty="l2")
+MODEL = LogisticRegression(solver="lbfgs", penalty="none")
 
 # Functions
 def read(file: str):
