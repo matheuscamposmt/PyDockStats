@@ -9,7 +9,7 @@ from putils import scale, num_derivative, find_nearest, read_result_file
 
 # Constants
 FORMATS = {"csv": pd.read_csv, "excel": pd.read_excel}
-MODEL = LogisticRegression(solver="lbfgs", penalty="none")
+MODEL = LogisticRegression(solver="lbfgs", penalty=None)
 
 # Functions
 def read(file: str):
@@ -36,7 +36,7 @@ def preprocess_data(df):
 
     return np.array(scores), np.array(actives)
 
-def generate_plots(program_name, scores, activity):
+def calculate_curves(program_name, scores, activity):
 
     x = scores
     predictions = fit_predict(x, activity)
@@ -55,7 +55,7 @@ def generate_plots(program_name, scores, activity):
     pc_x, pc_y = generate_percentiles(predictions[sorted_indices]), predictions[sorted_indices]
     
     roc_data = dict(x=fpr, y=tpr, auc=auc(fpr, tpr))
-    pc_data= dict(x=pc_x, y=pc_y, auc=bedroc(pc_x, pc_y, 0.1))
+    pc_data= dict(x=pc_x, y=pc_y, bedroc=0)
 
     return pc_data, roc_data
 
