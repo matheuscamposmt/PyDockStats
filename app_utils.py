@@ -7,7 +7,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from pydockstats import generate_plots
+from pydockstats import calculate_curves
+import numpy as np
+
 
 def set_max_width(pct_width: int = 70):
     max_width_str = f"max-width: {pct_width}%;"
@@ -28,6 +30,48 @@ def initialize_session_states():
     if 'programs' not in st.session_state:
         st.session_state.programs = []
 
+
+def get_matplotlib_ROC_plot():
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+    for expander in st.session_state['programs']:
+        program_name = expander.get_program_name()
+        _, roc_data = calculate_curves(program_name, st.session_state['data'][program_name]['scores'], st.session_state['data'][program_name]['activity'])
+        x,y = roc_data['x'], roc_data['y']
+        auc = roc_data['auc']
+        ax.plot(x, y, label=f"{program_name} | AUC={auc:.2f}")
+    
+    # Random line of the ROC curve
+    random_x = np.linspace(0, 1, 100)
+    random_y = random_x
+    ax.plot(random_x, random_y, linestyle='--', color='gray', label='Random')
+        
+
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
+    ax.set_title("ROC")
+    ax.legend()
+    return fig
+
+def get_matplotlib_PC_plot():
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    for expander in st.session_state['programs']:
+        program_name = expander.get_program_name()
+        print(st.session_state['data'][program_name])
+        pc_data, _ = calculate_curves(program_name, st.session_state['data'][program_name]['scores'], st.session_state['data'][program_name]['activity'])
+        x,y = pc_data['x'], pc_data['y']
+        ax.plot(x, y, label="program_name")
+
+    mean_value = st.session_state['data'][program_name]['scores'].mean()
+    ax.axhline(mean_value, color='gray', linestyle='--', label=f"Mean = {mean_value:.2f}")
+    
+    ax.set_xlabel("Quantile")
+    ax.set_ylabel("Activity probability")
+    ax.set_title("PC")
+    ax.legend()
+    return fig
+
 # Function to upload ligands and decoys files
 def upload_files(program_name):
     col1, col2 = st.columns(2)
@@ -46,34 +90,8 @@ def display_data_preview(df):
     st.subheader("Data Preview")
     st.dataframe(df)
 
-# Function to plot curves
-def plot_curve(fig, program_name, curve_data, curve_name):
-    x, y = curve_data['x'], curve_data['y']
-    auc = curve_data['auc']
-    text_legend = f"{program_name} | AUC={auc:.2f}" if curve_name == "ROC" else f"{program_name}"
-
-    hover_template = 'FPR: %{x}<br>TPR: %{y}<br>' if curve_name == "ROC" else 'Quantile: %{x}<br>Activity probability: %{y}<br>'
-    fig.add_trace(
-        go.Scatter(
-            x=x, y=y, mode='lines', 
-            name=text_legend, 
-            line=dict(width=3), showlegend=True,
-            hovertemplate=hover_template
-        )
-    )
-    
 
 
-# Function to save Plotly figures as images
-def save_plotly_figures_as_images(figures):
-    images = []
-    for fig in figures:
-        img_stream = BytesIO()
-        plt.savefig(img_stream, format='png', bbox_inches='tight')
-        img_stream.seek(0)
-        images.append(img_stream)
-        plt.close()
-    return images
 
 # Function to send email with attachments
 def send_email_with_attachments(to_email, subject, message, attachments):
