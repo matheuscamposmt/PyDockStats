@@ -23,9 +23,9 @@ def intro():
 def helper():
     with st.expander("How to use"):
         st.markdown("""
-                    With PyDockStats you can add as many programs as you want using the **"Add Program"** button below.
+                    With PyDockStats you can add as many programs as you want using the **"Add Program"** button below. The button will create a new expander with the name of the program.
                     
-                    In each program tab you can:
+                    In each program expander you can:
                     1. Paste the scores of the ligands and decoys in the data editor.
                     2. Preview the data to ensure it is correct.
                     3. View the PC and ROC curves generated from the data.
