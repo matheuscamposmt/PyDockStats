@@ -1,14 +1,10 @@
 import streamlit as st
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt  # Import matplotlib
-from io import BytesIO
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
 from email import encoders
 from pydockstats import calculate_curves
 import numpy as np
+import plotly.graph_objects as go
 
 
 def set_max_width(pct_width: int = 70):
@@ -31,9 +27,13 @@ def initialize_session_states():
         st.session_state.programs = []
 
 
-def get_matplotlib_ROC_plot():
+
+def get_matplotlib_ROC_plot(return_bytes=False):
 
     fig, ax = plt.subplots(figsize=(12, 7))
+    ax.set_xlim([0, 1])  # Set x-axis limits
+    ax.set_ylim([0, 1])  # Set y-axis limits
+
     for expander in st.session_state['programs']:
         program_name = expander.get_program_name()
         _, roc_data = calculate_curves(program_name, st.session_state['data'][program_name]['scores'], st.session_state['data'][program_name]['activity'])
@@ -46,11 +46,12 @@ def get_matplotlib_ROC_plot():
     random_y = random_x
     ax.plot(random_x, random_y, linestyle='--', color='gray', label='Random')
         
-
+    
     ax.set_xlabel("False Positive Rate")
     ax.set_ylabel("True Positive Rate")
     ax.set_title("ROC")
     ax.legend()
+
     return fig
 
 def get_matplotlib_PC_plot():
@@ -72,6 +73,25 @@ def get_matplotlib_PC_plot():
     ax.legend()
     return fig
 
+def get_plt_from_plotly(plotly_fig: go.Figure) -> plt.Figure:
+    # create a matplotlib figure like the plotly figure from a go.Figure object
+    plt.style.use('science')
+
+    plt_fig, ax = plt.subplots(figsize=(12, 7))
+    plotly_fig.for_each_trace(lambda trace: ax.plot(trace.x, trace.y, label=trace.name,linewidth=trace.line.width*0.8, linestyle=trace.line.dash, color=trace.line.color))
+
+    ax.set_xlabel(plotly_fig.layout.xaxis.title.text)
+    ax.set_ylabel(plotly_fig.layout.yaxis.title.text)
+    ax.set_title(plotly_fig.layout.title.text)
+
+    x_range = plotly_fig.layout.xaxis.range
+    y_range = plotly_fig.layout.yaxis.range
+    ax.set_xlim(x_range)
+    ax.set_ylim(y_range)
+    ax.legend()
+
+    return plt_fig
+
 # Function to upload ligands and decoys files
 def upload_files(program_name):
     col1, col2 = st.columns(2)
@@ -89,32 +109,3 @@ def upload_files(program_name):
 def display_data_preview(df):
     st.subheader("Data Preview")
     st.dataframe(df)
-
-
-
-
-# Function to send email with attachments
-def send_email_with_attachments(to_email, subject, message, attachments):
-    from_email = "matheuscamposmattos@id.uff.br"
-    password = "jdehlcenifasfjmb"
-
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(message, 'plain'))
-
-    for attachment in attachments:
-        part = MIMEBase('application', 'octet-stream')
-        part.set_payload(attachment.read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition', f'attachment; filename="test"')
-        msg.attach(part)
-
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(from_email, password)
-    server.sendmail(from_email, to_email, msg.as_string())
-    server.quit()
-
-# ----------------------------- #

@@ -48,13 +48,35 @@ if program_expanders.data_inputted:
                                             help="Generate the performance metrics figures")
                 
     if generate_button:
+        st.session_state['paths'] = dict()
         program_expanders.generate()
 
 if len(st.session_state['programs']) > 0:
     if len(st.session_state['data'].keys()) == len(st.session_state['programs']):
-        # generate the figures
-        fig_pc, fig_roc = generate_charts()
+        downloader = FigureDownloader("figures", engine='matplotlib')
 
+        # generate the figures
+        pc, roc = generate_charts()
+
+
+        with pc.container:
+            download_btn = st.download_button(
+                label="Download",
+                data=downloader.read_image(downloader.download(pc)),
+                file_name="pc.png",
+                mime="image/png",
+                key="pc_download"
+            )
+
+
+        with roc.container:
+            download_btn = st.download_button(
+                label="Download",
+                data=downloader.read_image(downloader.download(roc)),
+                file_name="roc.png",
+                mime="image/png",
+                key="roc_download"
+            )
 
         # download the figures and send to an input email
         email_expander = st.expander("Send to email")
@@ -69,12 +91,10 @@ if len(st.session_state['programs']) > 0:
                 if email:
                     # loading bar
                     progress_bar = st.progress(0)
-                    downloader = FigureDownloader("figures", engine='matplotlib')
-                    progress_bar.progress(0.2)
-                    paths = downloader.download([fig_pc, fig_roc])
-                    progress_bar.progress(0.5)
+                    paths = [downloader.download(pc), downloader.download(roc)]
+                    progress_bar.progress(0.3)
                     sender = EmailSender("smtp.gmail.com", 587)
-                    progress_bar.progress(0.8)
+                    progress_bar.progress(0.7)
                     sender.send_email_with_images(
                         email, "PyDockStats figures", paths
                     )

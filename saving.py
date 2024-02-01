@@ -60,26 +60,6 @@ class FigureDownloader:
         fig.write_image(path)
 
         return path
-
-    def save_matplotlib_as_images(self, return_bytes=False):
-
-        # create the parent directory
-        parent = f"{self.save_dir}/matplotlib"
-        if not os.path.exists(parent):
-            os.mkdir(parent)
-
-
-        plt.style.use('science')
-        pc_fig, roc_fig = get_matplotlib_PC_plot(), get_matplotlib_ROC_plot()
-
-        pc_fig.savefig(f"{parent}/pc.png", dpi=200)
-        roc_fig.savefig(f"{parent}/roc.png", dpi=200)
-        plt.close()
-
-        paths = [f"{parent}/pc.png", f"{parent}/roc.png"]
-        st.session_state['paths'] = paths
-
-        return paths
     
     def save_fig(self, name, dir, fig: go.Figure):
         if not os.path.exists(dir):
