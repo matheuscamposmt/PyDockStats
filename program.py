@@ -13,7 +13,8 @@ class Program:
         self.__fpr = None
         self.__tpr = None
 
-        self.all_data_generated = False
+        self.data_generated = False
+        self.data_inputted = False
 
     @property
     def quantiles(self):
@@ -34,6 +35,7 @@ class Program:
     def set_data(self, ligands, decoys):
         self.__ligands = ligands
         self.__decoys = decoys
+        self.data_inputted = True
 
     @property
     def ligands(self) -> pd.DataFrame:
@@ -45,10 +47,13 @@ class Program:
     
 
     def generate(self):
-        self.__ligands['activity'] = 1
-        self.__decoys['activity'] = 0
+        ligands_copy = self.__ligands.copy()
+        decoys_copy = self.__decoys.copy()
 
-        df = pd.concat([self.__ligands, self.__decoys], ignore_index=True).sample(frac=1)
+        ligands_copy['activity'] = 1
+        decoys_copy['activity'] = 0
+
+        df = pd.concat([ligands_copy, decoys_copy], ignore_index=True).sample(frac=1)
 
         scores, activity = preprocess_data(df)
 
@@ -60,5 +65,5 @@ class Program:
         self.__fpr = roc['x']
         self.__tpr = roc['y']
 
-        self.all_data_generated = True
+        self.data_generated = True
 

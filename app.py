@@ -33,17 +33,28 @@ st.divider()
 programs_expander = ProgramsExpander()
 
 # checkpoints container
-cp_container = st.container()
+save_cp_container = st.sidebar.container(border=False)
+upload_cp_container = st.sidebar.container()
+with save_cp_container:
+        save_col, download_col = st.columns(2)
+        save_button = save_col.button("💾 Save progress", key="save", 
+                                        type='secondary', help="Save the current state of the app",
+                                        disabled= not programs_expander.all_data_generated())
 
-import_col, export_col = cp_container.columns(2)
 
-with cp_container:
-    with import_col:
-        input_checkpoint = st.file_uploader("Upload a checkpoint file ", type="pkl", key="input_checkpoint")
-        # read the checkpoint file
-        if input_checkpoint:
-            programs_expander= pickle.loads(input_checkpoint.read())
-            st.success("Checkpoint loaded successfully.")
+with upload_cp_container:
+
+    st.subheader("📌Checkpoints")
+    input_checkpoint = st.file_uploader("Upload a checkpoint file ", type="pkl", key="input_checkpoint", 
+                                        help="Upload a checkpoint file to continue from where you left off")
+    load_button = st.button("📤 Load", key="load", type='secondary', help="Load a checkpoint file", disabled= not input_checkpoint,
+                            use_container_width=True)
+    # read the checkpoint file
+    if input_checkpoint and load_button:
+        programs_expander = pickle.loads(input_checkpoint.read())
+        st.success("Checkpoint loaded successfully.")
+        st.session_state['programs'] = programs_expander.expanders
+                
     
 
 st.subheader("Programs")
@@ -52,7 +63,8 @@ program_name_container = st.container()
 with program_name_container:
     program_name = st.text_input("Enter the name of the program (optional)", placeholder="Autodock Vina",
                                     max_chars=30, value="", key='program_name')
-    add_program = st.button("Add program", help="Add a new program tab",
+    
+    add_program = st.button("➕ Add program", help="Add a new program expander",
                             type='secondary', disabled=len(st.session_state['programs']) > 15)
     
     if add_program and program_name not in st.session_state['programs']:
@@ -64,75 +76,82 @@ programs_expander.render()
 
 # generate button
 if len(st.session_state['programs']) > 0:
-    generate_button = st.button("Generate", key="generate",
+    generate_button = st.button("✨ Generate", key="generate",
                                             use_container_width=True, type='primary',
                                             help="Generate the performance metrics figures",
                                             disabled = not programs_expander.all_data_inputted())
                     
     if generate_button:
         st.session_state['paths'] = dict()
+        with st.spinner("Generating data..."):
+            programs_expander.generate()
+        st.rerun()
 
-        for expander in programs_expander.expanders:
-            expander.program.generate()
 
-
-if programs_expander.all_data_generated() and len(programs_expander.expanders) > 0:
-    print(programs_expander.expanders)
+if programs_expander.all_data_generated():
     downloader = FigureDownloader("figures", engine='matplotlib')
 
-    pc = Predictiveness()
-    roc = ReceiverOperatingCharacteristic()
+    with st.spinner("Generating figures..."):
+        pc = Predictiveness()
+        roc = ReceiverOperatingCharacteristic()
 
-    
-    for expander in programs_expander.expanders:
-        program = expander.program
-        pc.add_plot(program)
-        roc.add_plot(program)
+        
+        for expander in programs_expander.expanders:
+            program = expander.program
+            pc.add_plot(program)
+            roc.add_plot(program)
 
-    with st.container() as pc_container:
-        st.subheader("Predictiveness Curve (PC)")
-        pc.render()
-        download_btn = st.download_button(
-            label="Download",
-            data=downloader.read_image(downloader.download(pc)),
-            file_name="pc.png",
-            mime="image/png",
-            use_container_width=True,
-            key="pc_download"
-        )
-        intro.pc_interpretation_help()
+        with st.container() as pc_container:
+            st.subheader("Predictiveness Curve (PC)")
+            pc.render()
+
+            _, pc_download_col, _ = st.columns([1, 2, 1])
+
+            st.write("")
+
+            download_btn = pc_download_col.download_button(
+                label="Download",
+                data=downloader.read_image(downloader.download(pc)),
+                file_name="pc.png",
+                mime="image/png",
+                use_container_width=True,
+                key="pc_download"
+            )
+            intro.pc_interpretation_help()
 
 
-    with st.container() as roc_container:
-        st.subheader("Receiver Operating Characteristic (ROC)")
-        roc.render()
-        download_btn = st.download_button(
-            label="Download",
-            data=downloader.read_image(downloader.download(roc)),
-            file_name="roc.png",
-            mime="image/png",
-            use_container_width=True,
-            key="roc_download"
-            
-        )
+        with st.container() as roc_container:
+            st.subheader("Receiver Operating Characteristic (ROC)")
+            roc.render()
+            _, roc_download_col, _ = st.columns([1, 2, 1])
 
-        intro.roc_interpretation_help()
+            st.write("")
+            download_btn = roc_download_col.download_button(
+                label="Download",
+                data=downloader.read_image(downloader.download(roc)),
+                file_name="roc.png",
+                mime="image/png",
+                use_container_width=True,
+                key="roc_download"
+            )
+            intro.roc_interpretation_help()
 
-    # save the pc, roc and expander objects
-    with cp_container:
-        st.markdown("#### Checkpoint saving")
-        export_col, download_col = cp_container.columns(2)
-        save_button = export_col.button("Save", key="save", type='secondary', help="Save the current state of the app")
+
+    with save_cp_container:
+
         if save_button:
+            print(1)
             with open("checkpoint.pkl", "wb") as f:
                 pickle.dump(programs_expander, f)
             st.success("Checkpoint saved successfully.")
+
             download_button = download_col.download_button(
-                label="Download",
+                label="📥 Download",
                 data=open("checkpoint.pkl", "rb"),
                 file_name="checkpoint.pkl",
                 mime="application/octet-stream",
-                key="download_checkpoint"
+                key="download_checkpoint",
+                use_container_width=True
             )
 
 
@@ -141,14 +160,11 @@ if programs_expander.all_data_generated() and len(programs_expander.expanders) >
 
 
     # download the figures and send to an input email
-    email_expander = st.expander("Send to email")
+    email_expander = st.expander("📪 Send to email")
     with email_expander:
-        st.markdown("""
-                    You can send the figures to an email by clicking on the send button below.
-                    """)
         
         email = st.text_input("Enter your email")
-        send_button = st.button("Send", key="send", type='primary', help="Send the figures to the email")
+        send_button = st.button("📨 Send", key="send", type='primary', help="Send the figures to the email")
         if send_button:
             if email:
                 # loading bar

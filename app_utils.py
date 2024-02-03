@@ -28,14 +28,20 @@ def initialize_session_states():
 
     if 'paths' not in st.session_state:
         st.session_state.paths = dict()
+    
+    if 'input_checkpoint_file' not in st.session_state:
+        st.session_state.input_checkpoint_file = None
 
 
 def get_plt_from_plotly(plotly_fig: go.Figure) -> plt.Figure:
     # create a matplotlib figure like the plotly figure from a go.Figure object
-    plt.style.use('science')
+    plt.style.use(['science', 'no-latex'])
+
+    colors = ['#0C5DA5', '#00B945', '#FF9500', '#FF2C00', '#845B97', '#474747', '#9e9e9e']
 
     plt_fig, ax = plt.subplots(figsize=(12, 7))
-    plotly_fig.for_each_trace(lambda trace: ax.plot(trace.x, trace.y, label=trace.name,linewidth=trace.line.width*0.8, linestyle=trace.line.dash, color=trace.line.color))
+    plotly_fig.for_each_trace(lambda trace: ax.plot(trace.x, trace.y, label=trace.name,linewidth=trace.line.width*0.8, 
+                                                    linestyle=trace.line.dash, color=trace.line.color))
 
     ax.set_xlabel(plotly_fig.layout.xaxis.title.text)
     ax.set_ylabel(plotly_fig.layout.yaxis.title.text)
