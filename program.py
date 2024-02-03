@@ -12,6 +12,7 @@ class Program:
 
         self.__fpr = None
         self.__tpr = None
+        self.__auc = None
 
         self.data_generated = False
         self.data_inputted = False
@@ -31,6 +32,10 @@ class Program:
     @property
     def tpr(self):
         return self.__tpr
+    
+    @property
+    def auc(self):
+        return self.__auc
         
     def set_data(self, ligands, decoys):
         self.__ligands = ligands
@@ -64,6 +69,7 @@ class Program:
 
         self.__fpr = roc['x']
         self.__tpr = roc['y']
+        self.__auc = roc['auc']
 
         self.data_generated = True
 

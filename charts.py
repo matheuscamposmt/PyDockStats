@@ -35,10 +35,11 @@ class Chart:
 
 
 class Curve(go.Scatter):
-    def __init__(self, x, y, program: Program, **kwargs):
-        super().__init__(x=x, y=y, mode='lines', name=program.name, line=dict(width=3, color=kwargs['color']), 
+    def __init__(self, x, y, program_name: str, **kwargs):
+        print(kwargs)
+        super().__init__(x=x, y=y, mode='lines', name=program_name, line=dict(width=3, color=kwargs['color']), 
                          showlegend=True, hovertemplate=kwargs['hovertemplate'],
-                         legend=kwargs['legend'])
+                         legend=kwargs['legend'], fill=kwargs['fill'])
 
 
 class Predictiveness(Chart):
@@ -48,9 +49,9 @@ class Predictiveness(Chart):
         
     def add_plot(self, program: Program):
         x, y = program.quantiles, program.probabilities
-        curve = Curve(x, y, program, 
+        curve = Curve(x, y, program.name, 
                       hovertemplate='Quantile: %{x}<br>Activity probability: %{y}<br>',
-                      legend=None, color=self._color_palette[len(self.curves)])
+                      legend=None, color=self._color_palette[len(self.curves)], fill=None)
         self.curves[program.name] = curve
         self.add_trace(curve)
 
@@ -61,7 +62,8 @@ class ReceiverOperatingCharacteristic(Chart):
 
     def add_plot(self, program: Program):
         x, y = program.fpr, program.tpr
-        curve = Curve(x, y, program,
-                      hovertemplate='False Positive Rate: %{x}<br>True Positive Rate: %{y}<br>',
-                      legend=None, color=self._color_palette[len(self.curves)])
+        program_name = f"{program.name} | AUC={program.auc:.3f}"
+        curve = Curve(x, y, program_name,
+                      hovertemplate='False Positive Rate: %{x}<br>True Positive Rate: %{y}<br> <br>AUC='+str(program.auc),
+                      legend=None, color=self._color_palette[len(self.curves)], fill='tozeroy')
         self.add_trace(curve)
