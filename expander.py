@@ -49,9 +49,10 @@ class ProgramExpander:
                                                     )
                                                 })
             decoys_df = decoy_data_editor
-            if decoys_df['score'].isnull().any() or ligands_df['score'].isnull().any():
-                st.warning("Please fill in all the scores")
-                return
+            
+        if decoys_df['score'].isnull().any() or ligands_df['score'].isnull().any():
+            st.warning("Please fill in all the scores")
+            return
 
 
         self.__program.set_data(ligands_df, decoys_df)
