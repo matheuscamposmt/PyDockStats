@@ -2,11 +2,12 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+from smtplib import SMTPRecipientsRefused, SMTPConnectError
 import streamlit as st
 import matplotlib.pyplot as plt
 import scienceplots
 from app_utils import get_plt_from_plotly
-from charts import Curve
+from charts import Chart
 import os
 import plotly.graph_objects as go
 
@@ -35,10 +36,22 @@ class EmailSender:
                 message.attach(image)
 
         text = message.as_string()
-        with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-            server.starttls()
-            server.login(self.__sender_email, self.__password)
-            server.sendmail(self.__sender_email, receiver_email, text)
+
+        try:
+            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                server.starttls()
+                server.login(self.__sender_email, self.__password)
+                server.sendmail(self.__sender_email, receiver_email, text)
+                return dict(status="success", message="Email sent successfully")
+
+        except SMTPRecipientsRefused:
+            return dict(status="SMTPRecipientsRefused", message=f"The email address \"{receiver_email}\" is not valid")
+        
+        except SMTPConnectError:
+            return dict(status="SMTPConnectError", message="Could not connect to the server")
+
+
+
 
 class FigureDownloader:
     def __init__(self, save_dir, engine='plotly'):
@@ -84,7 +97,7 @@ class FigureDownloader:
         with open(path, 'rb') as f:
             return f.read()
 
-    def download(self, curve: Curve):
+    def download(self, curve: Chart):
         plotly_fig = curve.get_figure()
 
         if self.engine == 'matplotlib':

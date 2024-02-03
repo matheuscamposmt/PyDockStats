@@ -52,12 +52,16 @@ def calculate_curves(program_name, scores, activity):
     print(f"Top {(1 - selected_x) * 100:.2f}% of the dataset:")
     print(f"-> EF: {enrichment_factor:.3f}")
 
-    pc_x, pc_y = generate_percentiles(predictions[sorted_indices]), predictions[sorted_indices]
+    pc_y = predictions[sorted_indices]
+    pc_x = generate_percentiles(pc_y)
     
     roc_data = dict(x=fpr, y=tpr, auc=auc(fpr, tpr))
     pc_data= dict(x=pc_x, y=pc_y, bedroc=0)
 
     return pc_data, roc_data
+
+def cdf(x, data):
+    return np.searchsorted(data, x, side='right') / len(data)
 
 def calculate_selected_x(predictions):
     x_prime, y_hat_prime = num_derivative(generate_percentiles(predictions), predictions)

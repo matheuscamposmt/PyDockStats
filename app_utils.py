@@ -26,6 +26,9 @@ def initialize_session_states():
     if 'programs' not in st.session_state:
         st.session_state.programs = []
 
+    if 'paths' not in st.session_state:
+        st.session_state.paths = dict()
+
 
 def get_plt_from_plotly(plotly_fig: go.Figure) -> plt.Figure:
     # create a matplotlib figure like the plotly figure from a go.Figure object
@@ -58,9 +61,4 @@ def upload_files(program_name):
         decoys_file = st.file_uploader("Choose a .csv or .lst file for the decoys", 
                                     type=['csv', 'lst', 'xlsx'], key=f"{program_name}_decoys")
     return ligands_file, decoys_file
-
-# Function to display data preview
-def display_data_preview(df):
-    st.subheader("Data Preview")
-    st.dataframe(df)
 

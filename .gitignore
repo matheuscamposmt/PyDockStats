@@ -8,3 +8,7 @@
 __pycache__
 
 devcontainer.json
+
+#images
+*.png
+*.jpg
