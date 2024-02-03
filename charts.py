@@ -27,8 +27,10 @@ class Chart:
         self.yaxis_title = yaxis_title
         self.__fig = go.Figure(layout=dict(title=dict(text=title, font=dict(size=20)), xaxis_title=xaxis_title,
                         yaxis_title=yaxis_title, legend=dict(orientation="v"),autosize=True, height=600,
-                        font=dict(family='Montserrat', size=20), legend_title_text="Programs"))
-        self.__fig.update_xaxes(range=[0, 1], constrain='domain', showgrid=True, showline=True, linewidth=1)
+                        font=dict(family='Montserrat', size=20), legend_title_text="Programs", showlegend=True, hovermode='x',
+                        spikedistance=-1))
+        self.__fig.update_xaxes(range=[0, 1], constrain='domain', showgrid=True, showline=True, linewidth=1,
+                                showspikes=True, spikemode='across', spikesnap='cursor')
         self.__fig.update_yaxes(range=[0, 1], constrain='domain', showgrid=True, showline=True, linewidth=1)
         self._color_palette = ['#0C5DA5', '#00B945', '#FF9500', '#FF2C00', '#845B97', '#474747', '#9e9e9e']
         self.curves: Dict[str, Curve] = dict()
