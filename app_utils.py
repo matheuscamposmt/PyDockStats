@@ -27,52 +27,6 @@ def initialize_session_states():
         st.session_state.programs = []
 
 
-
-def get_matplotlib_ROC_plot(return_bytes=False):
-
-    fig, ax = plt.subplots(figsize=(12, 7))
-    ax.set_xlim([0, 1])  # Set x-axis limits
-    ax.set_ylim([0, 1])  # Set y-axis limits
-
-    for expander in st.session_state['programs']:
-        program_name = expander.get_program_name()
-        _, roc_data = calculate_curves(program_name, st.session_state['data'][program_name]['scores'], st.session_state['data'][program_name]['activity'])
-        x,y = roc_data['x'], roc_data['y']
-        auc = roc_data['auc']
-        ax.plot(x, y, label=f"{program_name} | AUC={auc:.2f}")
-    
-    # Random line of the ROC curve
-    random_x = np.linspace(0, 1, 100)
-    random_y = random_x
-    ax.plot(random_x, random_y, linestyle='--', color='gray', label='Random')
-        
-    
-    ax.set_xlabel("False Positive Rate")
-    ax.set_ylabel("True Positive Rate")
-    ax.set_title("ROC")
-    ax.legend()
-
-    return fig
-
-def get_matplotlib_PC_plot():
-    fig, ax = plt.subplots(figsize=(12, 7))
-
-    for expander in st.session_state['programs']:
-        program_name = expander.get_program_name()
-        print(st.session_state['data'][program_name])
-        pc_data, _ = calculate_curves(program_name, st.session_state['data'][program_name]['scores'], st.session_state['data'][program_name]['activity'])
-        x,y = pc_data['x'], pc_data['y']
-        ax.plot(x, y, label="program_name")
-
-    mean_value = st.session_state['data'][program_name]['scores'].mean()
-    ax.axhline(mean_value, color='gray', linestyle='--', label=f"Mean = {mean_value:.2f}")
-    
-    ax.set_xlabel("Quantile")
-    ax.set_ylabel("Activity probability")
-    ax.set_title("PC")
-    ax.legend()
-    return fig
-
 def get_plt_from_plotly(plotly_fig: go.Figure) -> plt.Figure:
     # create a matplotlib figure like the plotly figure from a go.Figure object
     plt.style.use('science')
@@ -88,7 +42,7 @@ def get_plt_from_plotly(plotly_fig: go.Figure) -> plt.Figure:
     y_range = plotly_fig.layout.yaxis.range
     ax.set_xlim(x_range)
     ax.set_ylim(y_range)
-    ax.legend()
+    ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0.)
 
     return plt_fig
 
@@ -109,3 +63,4 @@ def upload_files(program_name):
 def display_data_preview(df):
     st.subheader("Data Preview")
     st.dataframe(df)
+
