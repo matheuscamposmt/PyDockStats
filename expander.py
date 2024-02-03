@@ -19,64 +19,39 @@ class ProgramExpander:
     def render(self):
         ligands_df, decoys_df = self.__program.ligands, self.__program.decoys
 
-        tabs= st.tabs(["Paste", "Upload"])
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            st.subheader(f"Paste the ligands and decoys scores for \"{self.__program.name}\" ")
 
-        with tabs[1]:
-            ligands_col, decoys_col = st.columns([1, 1])
+        with col2:
+            self.__remove_button = st.button("❌ Remove program", key=f'remove_{self.__program.name}_expander',
+                                        type='secondary', help="Remove this program expander")
 
-            with ligands_col:
-                ligands_uploader = st.file_uploader("Upload ligands", type="csv", key=f"{self.__program.name}_ligands",
-                                help="Upload a .csv file for the ligands")
-            
-                if ligands_uploader:
-                    ligands_df = pd.read_csv(ligands_uploader)
-
-            with decoys_col:
-                decoys_uploader = st.file_uploader("Upload decoys", type="csv", key=f"{self.__program.name}_decoys",
-                                help="Upload a .csv file for the decoys")
-                if decoys_uploader:
-                    decoys_df = pd.read_csv(decoys_uploader)
-                    decoys_df = decoy_data_editor
-
-        with tabs[0]:   
-            col1, col2 = st.columns([4, 1])
-            with col1:
-                st.subheader(f"Paste the ligands and decoys scores for \"{self.__program.name}\" ")
-
-            with col2:
-                self.__remove_button = st.button("❌ Remove program", key=f'remove_{self.__program.name}_expander',
-                                            type='secondary', help="Remove this program expander")
-
-            ligand_col, decoy_col = st.columns([1, 1], gap='small')
-            with ligand_col:
-                st.markdown("#### Ligands")
-                ligand_data_editor = st.data_editor(ligands_df, num_rows="dynamic",
-                                                        key=f"{self.__program.name}_ligands_editor",
-                                                        width=300, column_config={
-                                                            'score': st.column_config.NumberColumn(
-                                                                "Score of the ligands"
-                                                            )
-                                                        })
-                ligands_df = ligand_data_editor
-
-            with decoy_col:
-                st.markdown("#### Decoys")
-                decoy_data_editor = st.data_editor(decoys_df, num_rows="dynamic",
-                                                    key=f"{self.__program.name}_decoys_editor",
+        ligand_col, decoy_col = st.columns([1, 1], gap='small')
+        with ligand_col:
+            st.markdown("#### Ligands")
+            ligand_data_editor = st.data_editor(ligands_df, num_rows="dynamic",
+                                                    key=f"{self.__program.name}_ligands_editor",
                                                     width=300, column_config={
                                                         'score': st.column_config.NumberColumn(
-                                                            "Score of the decoys"
+                                                            "Score of the ligands"
                                                         )
                                                     })
-                decoys_df = decoy_data_editor
+            ligands_df = ligand_data_editor
+
+        with decoy_col:
+            st.markdown("#### Decoys")
+            decoy_data_editor = st.data_editor(decoys_df, num_rows="dynamic",
+                                                key=f"{self.__program.name}_decoys_editor",
+                                                width=300, column_config={
+                                                    'score': st.column_config.NumberColumn(
+                                                        "Score of the decoys"
+                                                    )
+                                                })
+            decoys_df = decoy_data_editor
             if decoys_df['score'].isnull().any() or ligands_df['score'].isnull().any():
                 st.warning("Please fill in all the scores")
                 return
-        
-        if len(ligands_df.columns) > 1 or len(decoys_df.columns) > 1:
-            # get the columns of the dataframe that contains "score" in the name
-            ligands_df = ligands_df.filter(like='score', axis=1)
-            decoys_df = decoys_df.filter(like='score', axis=1)
 
 
         self.__program.set_data(ligands_df, decoys_df)
