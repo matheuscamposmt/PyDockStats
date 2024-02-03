@@ -5,21 +5,6 @@ from program import Program
 from typing import List, Dict
 
 
-# Functions to plot the curve
-def plot_curve(chart, program_name, x, y, **kwargs):
-    chart.add_trace(
-        go.Scatter(
-            x=x, y=y, mode='lines',
-            name=kwargs['legend'],
-            line=dict(width=3), showlegend=True,
-            hovertemplate = kwargs['hovertemplate']
-
-
-        )
-    )
-
-
-
 class Chart:
     def __init__(self, name, title, xaxis_title, yaxis_title):
         self.name = name
