@@ -5,7 +5,6 @@ from expander import ProgramsExpanders
 from program import Program
 from charts import Predictiveness, ReceiverOperatingCharacteristic
 import sys
-import os
 import path
 from saving import EmailSender, FigureDownloader
 import pickle
@@ -19,7 +18,8 @@ st.set_page_config(
 DIR = path.Path(__file__).abspath()
 sys.path.append(DIR.parent.parent)
 
-utils.activate_google_analytics()
+utils.inject_ga()
+
 # Set page width
 utils.set_max_width(80)
 
