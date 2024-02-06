@@ -1,11 +1,13 @@
 import streamlit as st
 import pandas as pd
-from pydockstats import preprocess_data, calculate_curves
 from program import Program
-from typing import List
+from typing import List, Dict
 
 class ProgramExpander:
+    count = 1
     def __init__(self, program: Program):
+        self.id = ProgramExpander.count
+        ProgramExpander.count += 1
         self.__program = program
         self.__remove_button = None
 
@@ -18,7 +20,7 @@ class ProgramExpander:
 
     def render(self):
         ligands_df, decoys_df = self.__program.ligands, self.__program.decoys
-
+    
         col1, col2 = st.columns([4, 1])
         with col1:
             st.subheader(f"Paste the ligands and decoys scores for \"{self.__program.name}\" ")
@@ -65,20 +67,39 @@ class ProgramExpander:
 
 
 
-class ProgramsExpander:
-    def __init__(self):
-        self.__expanders: List[ProgramExpander] = st.session_state['programs']
+class ProgramsExpanders:
+    def __init__(self, import_dict: dict = None):
+        self.expanded = True
+        if import_dict:
+            self.expanded = False
+            self.__expanders = []
+            for name, data in import_dict.items():
+                program = Program(name)
+                program.set_data(data['ligands'], data['decoys'])
+                self.__expanders.append(ProgramExpander(program))
+        else:
+            self.__expanders: List[ProgramExpander] = st.session_state['programs']
 
     @property
     def expanders(self) -> List[ProgramExpander]:
         return self.__expanders
+    
+    @property
+    def programs(self) -> List[Program]:
+        return [expander.program for expander in self.__expanders]
+    
+    @property
+    def names(self) -> List[str]:
+        return [expander.program.name for expander in self.__expanders]
 
-    def add_program(self, program: Program):
-        if program.name not in [expander.program.name for expander in self.__expanders]:
-            self.__expanders.append(ProgramExpander(program))
+    def add_program_expander(self, name: str):
+        expander = ProgramExpander(Program(name))
+
+        if expander.program.name not in self.names:
+            self.__expanders.append(expander)
 
     def remove_expander(self, expander: ProgramExpander):
-        self.__expanders = self.__expanders.remove(expander)
+        self.__expanders.remove(expander)
 
         try:
             del st.session_state['data'][expander.program.name]
@@ -89,8 +110,9 @@ class ProgramsExpander:
     def render(self):
         if self.__expanders:
             for expander in self.__expanders:
-                with st.expander(expander.program.name, expanded=True):
+                with st.expander(expander.program.name, expanded=self.expanded):
                     expander.render()
+
                 if expander.is_remove_button_clicked():
                     self.remove_expander(expander)
 
@@ -109,3 +131,6 @@ class ProgramsExpander:
         for expander in self.__expanders:
             expander.generate()
 
+    def to_dict(self) -> Dict[str, Dict[str, pd.DataFrame]]:
+        return {program.name: program.to_dict() for program in self.programs}
+        

@@ -42,26 +42,18 @@ def calculate_curves(program_name, scores, activity):
     predictions = fit_predict(x, activity)
     sorted_indices = np.argsort(predictions)
 
-    fpr, tpr, _ = roc_curve(activity[sorted_indices], predictions[sorted_indices], pos_label=1)
-
-    selected_x = calculate_selected_x(predictions)
-    hits_x, hits_t = calculate_hits(activity[sorted_indices], selected_x, activity)
-    enrichment_factor = calculate_EF(hits_x, hits_t, 1 - selected_x)
-
-    print(f"[*] {program_name}")
-    print(f"Top {(1 - selected_x) * 100:.2f}% of the dataset:")
-    print(f"-> EF: {enrichment_factor:.3f}")
+    fpr, tpr, threshs = roc_curve(activity[sorted_indices], predictions[sorted_indices], pos_label=1)
 
     pc_y = predictions[sorted_indices]
     pc_x = generate_percentiles(pc_y)
+
+    prevalence = sum(activity) / len(activity)
+    enrichment_factors = [calculate_EF(*calculate_hits(activity[sorted_indices], x, activity), 1 - x) for x in pc_x]
     
-    roc_data = dict(x=fpr, y=tpr, auc=auc(fpr, tpr))
-    pc_data= dict(x=pc_x, y=pc_y, bedroc=0)
+    roc_data = dict(x=fpr, y=tpr, auc=auc(fpr, tpr), thresholds=threshs)
+    pc_data= dict(x=pc_x, y=pc_y, avg_score=prevalence, efs=enrichment_factors)
 
     return pc_data, roc_data
-
-def cdf(x, data):
-    return np.searchsorted(data, x, side='right') / len(data)
 
 def calculate_selected_x(predictions):
     x_prime, y_hat_prime = num_derivative(generate_percentiles(predictions), predictions)

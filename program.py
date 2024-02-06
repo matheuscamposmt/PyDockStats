@@ -9,10 +9,13 @@ class Program:
 
         self.__quantiles = None
         self.__probabilities = None
+        self.__prevalence = None
+        self.__enrichment_factors = None
 
         self.__fpr = None
         self.__tpr = None
         self.__auc = None
+        self.__thresholds = None
 
         self.data_generated = False
         self.data_inputted = False
@@ -26,6 +29,14 @@ class Program:
         return self.__probabilities
     
     @property
+    def prevalence(self):
+        return self.__prevalence
+    
+    @property
+    def enrichment_factors(self):
+        return self.__enrichment_factors
+    
+    @property
     def fpr(self):
         return self.__fpr
     
@@ -36,7 +47,11 @@ class Program:
     @property
     def auc(self):
         return self.__auc
-        
+    
+    @property
+    def thresholds(self):
+        return self.__thresholds
+    
     def set_data(self, ligands, decoys):
         self.__ligands = ligands
         self.__decoys = decoys
@@ -66,10 +81,19 @@ class Program:
 
         self.__quantiles = pc['x']
         self.__probabilities = pc['y']
+        self.__prevalence = pc['avg_score']
+        self.__enrichment_factors = pc['efs']
 
         self.__fpr = roc['x']
         self.__tpr = roc['y']
         self.__auc = roc['auc']
+        self.__thresholds = roc['thresholds']
 
         self.data_generated = True
+
+    def to_dict(self):
+        return {
+            'ligands': self.__ligands,
+            'decoys': self.__decoys,
+        }
 

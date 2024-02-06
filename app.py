@@ -1,10 +1,11 @@
 import streamlit as st
 import app_utils as utils
 import introduction as intro
-from expander import ProgramsExpander
+from expander import ProgramsExpanders
 from program import Program
-from charts import Chart, Predictiveness, ReceiverOperatingCharacteristic
+from charts import Predictiveness, ReceiverOperatingCharacteristic
 import sys
+import os
 import path
 from saving import EmailSender, FigureDownloader
 import pickle
@@ -15,46 +16,62 @@ st.set_page_config(
     layout="wide"
 
 )
-
 DIR = path.Path(__file__).abspath()
 sys.path.append(DIR.parent.parent)
 
+# inject the google search console tag
+utils.inject_google_search_console()
+
 # Set page width
-utils.set_max_width(70)
+utils.set_max_width(80)
+
 # Initialize session states
 utils.initialize_session_states()
 
 # introduction
 intro.intro()
 intro.general_help()
-st.divider()
 
-# programs expander
-programs_expander = ProgramsExpander()
+st.divider()
+# expanders
+programs_expanders = ProgramsExpanders()
 
 # checkpoints container
+st.sidebar.header("📌Checkpoints")
 save_cp_container = st.sidebar.container(border=False)
 upload_cp_container = st.sidebar.container()
+
+
 with save_cp_container:
         save_col, download_col = st.columns(2)
         save_button = save_col.button("💾 Save progress", key="save", 
                                         type='secondary', help="Save the current state of the app",
-                                        disabled= not programs_expander.all_data_generated())
+                                        disabled= not programs_expanders.all_data_generated())
 
 
 with upload_cp_container:
 
-    st.subheader("📌Checkpoints")
-    input_checkpoint = st.file_uploader("Upload a checkpoint file ", type="pkl", key="input_checkpoint", 
+    input_checkpoint = st.file_uploader("📁 Upload a checkpoint file ", type="pkl", key="input_checkpoint", 
                                         help="Upload a checkpoint file to continue from where you left off")
     load_button = st.button("📤 Load", key="load", type='secondary', help="Load a checkpoint file", disabled= not input_checkpoint,
                             use_container_width=True)
-    # read the checkpoint file
+    
     if input_checkpoint and load_button:
-        programs_expander = pickle.loads(input_checkpoint.read())
-        st.success("Checkpoint loaded successfully.")
-        st.session_state['programs'] = programs_expander.expanders
-                
+        # load the checkpoint file
+        import_dict = pickle.loads(input_checkpoint.read())
+
+        # create a new ProgramsExpanders object importing the data from the checkpoint
+        programs_expanders = ProgramsExpanders(import_dict)
+
+        # update the programs in cache
+        st.session_state['programs'] = programs_expanders.expanders
+
+        # reset the cached images paths
+        st.session_state['paths'] = dict()
+
+        programs_expanders.generate()
+        st.success("✔️ Checkpoint loaded successfully.")
+
     
 
 st.subheader("Programs")
@@ -66,41 +83,44 @@ with program_name_container:
     
     add_program = st.button("➕ Add program", help="Add a new program expander",
                             type='secondary', disabled=len(st.session_state['programs']) > 15)
+
     
-    if add_program and program_name not in st.session_state['programs']:
-        program = Program(program_name.strip() if program_name else f"Program {len(st.session_state.programs) + 1}")
-        programs_expander.add_program(program)
+    if add_program:
+        program_id = st.session_state['programs'][-1].id + 1 if st.session_state['programs'] else 1
+
+        name = program_name.strip() if program_name else f"Program {program_id}"
+
+        programs_expanders.add_program_expander(name)
 
 
-programs_expander.render()
+programs_expanders.render()
 
 # generate button
 if len(st.session_state['programs']) > 0:
     generate_button = st.button("✨ Generate", key="generate",
                                             use_container_width=True, type='primary',
                                             help="Generate the performance metrics figures",
-                                            disabled = not programs_expander.all_data_inputted())
+                                            disabled = not programs_expanders.all_data_inputted())
                     
     if generate_button:
         st.session_state['paths'] = dict()
         with st.spinner("Generating data..."):
-            programs_expander.generate()
+            programs_expanders.generate()
         st.rerun()
 
 
-if programs_expander.all_data_generated():
+if programs_expanders.all_data_generated():
     downloader = FigureDownloader("figures", engine='matplotlib')
 
     with st.spinner("Generating figures..."):
         pc = Predictiveness()
         roc = ReceiverOperatingCharacteristic()
 
-        
-        for expander in programs_expander.expanders:
-            program = expander.program
+        pc.add_prevalence_line(programs_expanders.programs)
+        for program in programs_expanders.programs:
             pc.add_plot(program)
             roc.add_plot(program)
-
+        
         with st.container() as pc_container:
             st.subheader("Predictiveness Curve (PC)")
             pc.render()
@@ -110,7 +130,7 @@ if programs_expander.all_data_generated():
             st.write("")
 
             download_btn = pc_download_col.download_button(
-                label="Download",
+                label="📥 Download chart",
                 data=downloader.read_image(downloader.download(pc)),
                 file_name="pc.png",
                 mime="image/png",
@@ -127,7 +147,7 @@ if programs_expander.all_data_generated():
 
             st.write("")
             download_btn = roc_download_col.download_button(
-                label="Download",
+                label="📥 Download chart",
                 data=downloader.read_image(downloader.download(roc)),
                 file_name="roc.png",
                 mime="image/png",
@@ -140,10 +160,9 @@ if programs_expander.all_data_generated():
     with save_cp_container:
 
         if save_button:
-            print(1)
             with open("checkpoint.pkl", "wb") as f:
-                pickle.dump(programs_expander, f)
-            st.success("Checkpoint saved successfully.")
+                pickle.dump(programs_expanders.to_dict(), f)
+            st.success("✔️ Checkpoint saved successfully.")
 
             download_button = download_col.download_button(
                 label="📥 Download",

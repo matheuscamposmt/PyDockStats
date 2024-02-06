@@ -33,16 +33,18 @@ def intro():
 def general_help():
     with st.expander("How to use"):
         st.markdown("""
-                    With PyDockStats you can add as many programs as you want using the **"Add Program"** button below. The button will create a new expander with the name of the program. 
+                    With PyDockStats you can add as many programs as you want using the **➕ Add Program** button below. The button will create a new expander with the name of the program. 
                     In each program expander you can paste the scores of the ligands and decoys in the data editor, being able to add as many rows as you want and preview the data in a table.
                     
-                    - After adding the scores, you can click on the **"Generate"** button to create the ROC and PC curves for each program.
+                    - After adding the scores, you can click on the **✨ Generate** button to create the ROC and PC curves for each program.
 
                     - The tool will create a logistic regression model from the data and analyze the relationship between the score of the molecule and the activity to understand if the score has a effect on the activity and have the ability to separate the **True Positives** from the **False Positives**.
 
-                    - The ROC and PC curves will be displayed in the same page and you can download the figures using the **"Download"** button below the figures.
+                    - The ROC and PC curves will be displayed in the same page and you can download the figures using the **📥 Download** button below each figure.
 
-                    - Also, you can send the figures to your email using the **"Send"** button below the figures.
+                    - Also, you can send the figures to your email on the bottom of the page.
+
+                    - Finally, you can save your progress using the **💾 Save progress** button on the sidebar and then download the checkpoint (.pkl). Later, you can **📁 Upload the checkpoint file**, **📤 Load** it and continue your analysis from where you left off.
                     """)
         
 def pc_interpretation_help():
@@ -58,8 +60,8 @@ def pc_interpretation_help():
 def roc_interpretation_help():
     with st.expander("🤔 How to interpret the curve?"):
         st.markdown("""
-                    The ROC curve is a graphical plot that describes the performance of a binary classifier. By plotting the True Positive Rate (TPR) against the False Positive Rate (FPR) 
-                    at various threshold settings, the ROC curve has the ability to visualize the trade-offs between the Sensitivity (TPR) and the Specificity (1 - FPR) as the discrimination threshold is varied. In other words
-                    we want to maximize Sensitivity and the Specificity at the same time, but in practice this is not totally possible, so the ROC curve is a way to find the best configuration that equilibrate both measures.
-                    Also, the **Area Under** the ROC **Curve** (AUC) is the overall measure of the ability of a scoring function to distinguish between true positives (true active) and false positives (decoys).
+                    Each point is a different threshold for the logistic regression model to decide if a compound is active or not. For each point, the True Positive Rate (TPR) and the False Positive Rate (FPR) are calculated,
+                    and the ROC curve is a plot of the TPR against the FPR. The ROC curve has the ability to visualize the trade-offs between the Sensitivity (TPR) and the Specificity (1 - FPR) as the discrimination threshold is varied. 
+                    In other wordswe want to maximize Sensitivity and the Specificity at the same time, but in practice this is not totally possible, so the ROC curve is a way to find the best configuration that 
+                    equilibrate both measures. Also, the **Area Under** the ROC **Curve** (AUC) is the overall measure of the ability of a scoring function to distinguish between true positives (true active) and false positives (decoys).
                     """)

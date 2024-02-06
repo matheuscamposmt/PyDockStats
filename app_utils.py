@@ -2,9 +2,38 @@ import streamlit as st
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt  # Import matplotlib
 from email import encoders
+import os
 from pydockstats import calculate_curves
 import numpy as np
 import plotly.graph_objects as go
+import re
+
+
+
+# function to inject the google search console meta tag
+def inject_google_search_console():
+    code = """<!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LYNYL4BZTX"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LYNYL4BZTX');
+    </script>"""
+
+    a=os.path.dirname(st.__file__)+'/static/index.html'
+    with open(a, 'r') as f:
+        data=f.read()
+        if len(re.findall('G-', data))==0:
+            with open(a, 'w') as ff:
+                newdata=re.sub('<head>','<head>'+code,data)
+                ff.write(newdata)
+
+    print("Google search console tag injected, tag=G-LYNYL4BZTX")
+    
+                
+            
+
 
 
 def set_max_width(pct_width: int = 70):
@@ -16,42 +45,45 @@ def set_max_width(pct_width: int = 70):
 
 # Function to initialize session states
 def initialize_session_states():
-    if 'decoy_data' not in st.session_state:
-        st.session_state.decoy_data = None
-    if 'ligand_data' not in st.session_state:
-        st.session_state.ligand_data = None
-    if 'data' not in st.session_state:
-        st.session_state.data = dict()
-
     if 'programs' not in st.session_state:
         st.session_state.programs = []
 
     if 'paths' not in st.session_state:
         st.session_state.paths = dict()
-    
-    if 'input_checkpoint_file' not in st.session_state:
-        st.session_state.input_checkpoint_file = None
 
 
 def get_plt_from_plotly(plotly_fig: go.Figure) -> plt.Figure:
     # create a matplotlib figure like the plotly figure from a go.Figure object
     plt.style.use(['science', 'no-latex'])
 
-    colors = ['#0C5DA5', '#00B945', '#FF9500', '#FF2C00', '#845B97', '#474747', '#9e9e9e']
+    plt_fig, ax = plt.subplots(figsize=(10, 7))
 
-    plt_fig, ax = plt.subplots(figsize=(12, 7))
-    plotly_fig.for_each_trace(lambda trace: ax.plot(trace.x, trace.y, label=trace.name,linewidth=trace.line.width*0.8, 
-                                                    linestyle=trace.line.dash, color=trace.line.color))
+    def convert_line_dash(dash):
+        if dash == 'dash':
+            return '--'
+        elif dash == 'dot':
+            return ':'
+        else:
+            return '-'
+        
+    def format_trace_label(label: str):
+        return label.replace('<br>', '').replace('<b>', '').replace('</b>', '')
+        
+    plotly_fig.for_each_trace(lambda trace: ax.plot(trace.x, trace.y, label=format_trace_label(trace.name), linewidth=trace.line.width*0.8, 
+                                                    linestyle=convert_line_dash(trace.line.dash), color=trace.line.color))
 
-    ax.set_xlabel(plotly_fig.layout.xaxis.title.text)
-    ax.set_ylabel(plotly_fig.layout.yaxis.title.text)
-    ax.set_title(plotly_fig.layout.title.text)
+    ax.set_xlabel(plotly_fig.layout.xaxis.title.text, fontsize=14)
+    ax.set_ylabel(plotly_fig.layout.yaxis.title.text, fontsize=14)
+    ax.set_title(plotly_fig.layout.title.text, fontsize=17)
+
+    plt.grid(True, alpha=0.2, linewidth=0.4, color='black')
 
     x_range = plotly_fig.layout.xaxis.range
     y_range = plotly_fig.layout.yaxis.range
     ax.set_xlim(x_range)
     ax.set_ylim(y_range)
-    ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0.)
+    #ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0.)
+    ax.legend(loc='best', fontsize=11, frameon=True)
 
     return plt_fig
 
