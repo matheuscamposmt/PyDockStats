@@ -7,29 +7,17 @@ from pydockstats import calculate_curves
 import numpy as np
 import plotly.graph_objects as go
 import re
+import streamlit.components.v1 as components
 
 
 
 # function to inject the google search console meta tag
-def inject_google_search_console():
-    code = """<!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LYNYL4BZTX"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-LYNYL4BZTX');
-    </script>"""
+def activate_google_analytics():
+    with open("google_analytics.html", "r") as f:
+        html_code = f.read()
+        components.html(html_code, height=0)
 
-    a=os.path.dirname(st.__file__)+'/static/index.html'
-    with open(a, 'r') as f:
-        data=f.read()
-        if len(re.findall('G-', data))==0:
-            with open(a, 'w') as ff:
-                newdata=re.sub('<head>','<head>'+code,data)
-                ff.write(newdata)
-
-    print("Google search console tag injected, tag=G-LYNYL4BZTX")
+    print("Google Analytics activated")
     
                 
             

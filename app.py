@@ -19,9 +19,7 @@ st.set_page_config(
 DIR = path.Path(__file__).abspath()
 sys.path.append(DIR.parent.parent)
 
-# inject the google search console tag
-utils.inject_google_search_console()
-
+utils.activate_google_analytics()
 # Set page width
 utils.set_max_width(80)
 
