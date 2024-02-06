@@ -7,7 +7,7 @@ from pydockstats import calculate_curves
 import numpy as np
 import plotly.graph_objects as go
 import re
-import streamlit.components.v1 as components
+import streamlit as st
 
 
 
@@ -15,7 +15,7 @@ import streamlit.components.v1 as components
 def activate_google_analytics():
     with open("google_analytics.html", "r") as f:
         html_code = f.read()
-        components.html(html_code, height=0)
+        st.markdown(html_code, unsafe_allow_html=True)
 
     print("Google Analytics activated")
     
