@@ -1,11 +1,9 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.metrics import auc, roc_curve
 from sklearn.linear_model import LogisticRegression
-from calcs import optimal_threshold, calculate_hits, calculate_EF, calculate_TG, calculate_pTG, bedroc
-from curves import PC, ROC
-from putils import scale, num_derivative, find_nearest, read_result_file
+from calcs import calculate_hits, calculate_EF
+from putils import scale, num_derivative
 
 # Constants
 FORMATS = {"csv": pd.read_csv, "excel": pd.read_excel}
