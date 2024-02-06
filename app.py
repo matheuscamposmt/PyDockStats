@@ -18,8 +18,6 @@ st.set_page_config(
 DIR = path.Path(__file__).abspath()
 sys.path.append(DIR.parent.parent)
 
-utils.inject_ga()
-
 # Set page width
 utils.set_max_width(80)
 
