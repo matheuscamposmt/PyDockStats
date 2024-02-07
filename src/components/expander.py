@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from program import Program
+from components.program import Program
 from typing import List, Dict
 
 class ProgramExpander:

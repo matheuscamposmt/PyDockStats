@@ -1,34 +1,38 @@
-import streamlit as st
-import app_utils as utils
-import introduction as intro
-from expander import ProgramsExpanders
-from program import Program
-from charts import Predictiveness, ReceiverOperatingCharacteristic
 import sys
 import path
-from saving import EmailSender, FigureDownloader
 import pickle
+# app imports ----------------
+import streamlit as st
+import utils.app_utils as utils
+import components.info as info
+from components.expander import ProgramsExpanders
+from components.charts import Predictiveness, ReceiverOperatingCharacteristic
+from utils.saving import EmailSender, FigureDownloader
+from streamlit_option_menu import option_menu
 
-st.set_page_config(
-    page_title="PyDockStats",
-    page_icon="assets/logo.png",
-    layout="wide"
 
-)
+
 DIR = path.Path(__file__).abspath()
 sys.path.append(DIR.parent.parent)
 
-# Set page width
-utils.set_max_width(80)
+
+st.set_page_config(
+    page_title="Home • PyDockStats",
+    page_icon="🏠",
+    layout="wide"
+
+)
+
+utils.set_max_width(90)
 
 # Initialize session states
 utils.initialize_session_states()
 
 # introduction
-intro.intro()
-intro.general_help()
+info.intro()
 
-st.divider()
+info.general_help()
+
 # expanders
 programs_expanders = ProgramsExpanders()
 
@@ -133,7 +137,7 @@ if programs_expanders.all_data_generated():
                 use_container_width=True,
                 key="pc_download"
             )
-            intro.pc_interpretation_help()
+            info.pc_interpretation_help()
 
 
         with st.container() as roc_container:
@@ -150,7 +154,7 @@ if programs_expanders.all_data_generated():
                 use_container_width=True,
                 key="roc_download"
             )
-            intro.roc_interpretation_help()
+            info.roc_interpretation_help()
 
 
     with save_cp_container:

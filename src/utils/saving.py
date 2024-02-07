@@ -6,8 +6,8 @@ from smtplib import SMTPRecipientsRefused, SMTPConnectError
 import streamlit as st
 import matplotlib.pyplot as plt
 import scienceplots
-from app_utils import get_plt_from_plotly
-from charts import Chart
+from utils.app_utils import get_plt_from_plotly
+from components.charts import Chart
 import os
 import plotly.graph_objects as go
 

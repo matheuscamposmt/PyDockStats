@@ -2,11 +2,9 @@ import streamlit as st
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt  # Import matplotlib
 from email import encoders
-import os
-from pydockstats import calculate_curves
+from model.pydockstats import calculate_curves
 import numpy as np
 import plotly.graph_objects as go
-import re
 import streamlit as st
 
 # function to inject the google search console meta tag
@@ -17,10 +15,6 @@ def activate_google_analytics():
 
     print("Google Analytics activated")
     
-                
-            
-
-
 
 def set_max_width(pct_width: int = 70):
     max_width_str = f"max-width: {pct_width}%;"

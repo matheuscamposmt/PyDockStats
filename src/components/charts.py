@@ -1,7 +1,7 @@
 import streamlit as st
-from pydockstats import calculate_curves
+from model.pydockstats import calculate_curves
 import plotly.graph_objects as go
-from program import Program
+from components.program import Program
 from typing import List, Dict
 
 

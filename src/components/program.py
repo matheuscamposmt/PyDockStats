@@ -1,5 +1,5 @@
 import pandas as pd
-from pydockstats import calculate_curves, preprocess_data
+from model.pydockstats import calculate_curves, preprocess_data
 
 class Program:
     def __init__(self, name: str):
