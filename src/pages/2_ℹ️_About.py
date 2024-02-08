@@ -1,5 +1,5 @@
 import streamlit as st
-import components.info as info
+import info as info
 import utils.app_utils as utils
 
 

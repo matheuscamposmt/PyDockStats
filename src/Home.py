@@ -4,12 +4,10 @@ import pickle
 # app imports ----------------
 import streamlit as st
 import utils.app_utils as utils
-import components.info as info
+import info as info
 from components.expander import ProgramsExpanders
 from components.charts import Predictiveness, ReceiverOperatingCharacteristic
 from utils.saving import EmailSender, FigureDownloader
-
-
 
 DIR = path.Path(__file__).abspath()
 sys.path.append(DIR.parent.parent)
