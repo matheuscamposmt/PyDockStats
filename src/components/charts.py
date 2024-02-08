@@ -96,7 +96,7 @@ class ReceiverOperatingCharacteristic(Chart):
         x, y = program.fpr, program.tpr
         
         legend_title = f"{program.name}: <br><b>AUC={program.auc:.3f}</b>"
-        hover = 'False Positive Rate: %{x:.3f}<br>True Positive Rate: %{y:.3f}<br>' + f'AUC={program.auc:.3F}' + '<br>Threshold=%{customdata:.3f}'
+        hover = 'False Positive Rate: %{x:.3f}<br>True Positive Rate: %{y:.3f}<br>Threshold=%{customdata:.3f}'
 
         curve = go.Scatter(x=x, y=y, mode='lines', name=legend_title, line=dict(width=3, color=self._color_palette[len(self.curves)]),
                             showlegend=True, hovertemplate=hover,
