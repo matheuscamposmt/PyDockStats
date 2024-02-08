@@ -96,4 +96,8 @@ class Program:
             'ligands': self.__ligands,
             'decoys': self.__decoys,
         }
+    
+    def from_dict(self, data: dict):
+        self.__ligands = data['ligands']
+        self.__decoys = data['decoys']
 

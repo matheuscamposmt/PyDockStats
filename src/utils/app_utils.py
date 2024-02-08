@@ -32,6 +32,7 @@ def initialize_session_states():
         st.session_state.paths = dict()
 
 
+
 def get_plt_from_plotly(plotly_fig: go.Figure) -> plt.Figure:
     # create a matplotlib figure like the plotly figure from a go.Figure object
     plt.style.use(['science', 'no-latex'])

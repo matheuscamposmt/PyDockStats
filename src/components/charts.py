@@ -6,7 +6,9 @@ from typing import List, Dict
 
 
 class Chart:
-    def __init__(self, name, title, xaxis_title, yaxis_title):
+    def __init__(self, name, title, xaxis_title, yaxis_title, show_xspikes=False):
+        self.programs: List[Program] = []
+
         self.name = name
         self.xaxis_title = xaxis_title
         self.yaxis_title = yaxis_title
@@ -14,8 +16,14 @@ class Chart:
                         yaxis_title=yaxis_title, legend=dict(orientation="v"),autosize=True, height=600,
                         font=dict(family='Montsserrat'), legend_title_text="Programs",
                         spikedistance=-1))
+        
+        xspikes_params = {}
+        if show_xspikes:
+            xspikes_params = dict(showspikes=True, spikemode='across', spikesnap='cursor')
+
         self.__fig.update_xaxes(range=[0, 1], constrain='domain', showgrid=True, showline=True, linewidth=1,
-                                showspikes=True, spikemode='across', spikesnap='cursor')
+                                **xspikes_params)
+        
         self.__fig.update_yaxes(range=[0, 1], constrain='domain', showgrid=True, showline=True, linewidth=1)
         self.__fig.update_layout(margin=dict(l=60, r=60, b=0, t=100), plot_bgcolor='white')
         # increase the font sizes, except for the title
@@ -27,6 +35,9 @@ class Chart:
     def add_trace(self, curve: go.Scatter) -> None:
         self.curves[curve.name] = curve
         self.__fig.add_trace(curve)
+
+    def add_program(self, program: Program) -> None:
+        self.programs.append(program)
 
     def get_figure(self) -> go.Figure:
         return self.__fig
@@ -40,21 +51,29 @@ class Chart:
 
 class Predictiveness(Chart):
     def __init__(self):
-        super().__init__("PC", "Predictiveness Curve", "Quantile", "Activity probability")
+        super().__init__("PC", "Predictiveness Curve", "Quantile", "Activity probability", show_xspikes=True)
+
+    
+    def on_click_quantile(self, quantile: float):
+        st.markdown("You clicked on the quantile: " + str(quantile))
+        
+        for program in self.programs:
+            st.metric(label=f"({program.name})", value=program.enrichment_factors[program.quantiles.index(quantile)], delta=0.01, delta_color='normal')
 
         
     def add_plot(self, program: Program):
         x, y = program.quantiles, program.probabilities
-        enrichment_factors = program.enrichment_factors
 
         legend_title = f"{program.name}"
         hover = 'Quantile: %{x:.2f}<br>Activity probability: %{y:.2f}<br>Enrichment Factor: %{customdata:.3f}'
 
         curve = go.Scatter(x=x, y=y, mode='lines', name=legend_title, line=dict(width=3, color=self._color_palette[len(self.curves)]),
                             showlegend=True, hovertemplate=hover,
-                            customdata=enrichment_factors,
-                            legendgroup=program.name, fill=None)
+                            customdata=program.enrichment_factors,
+                            legendgroup=program.name, fill=None,)
         self.curves[program.name] = curve
+
+        self.add_program(program)
         self.add_trace(curve)
 
     def add_prevalence_line(self, programs: List[Program]):
@@ -75,7 +94,6 @@ class ReceiverOperatingCharacteristic(Chart):
 
     def add_plot(self, program: Program):
         x, y = program.fpr, program.tpr
-        thresholds=program.thresholds 
         
         legend_title = f"{program.name}: <br><b>AUC={program.auc:.3f}</b>"
         hover = 'False Positive Rate: %{x}<br>True Positive Rate: %{y}<br>' + f'AUC={str(program.auc)}' + '<br>Threshold=%{customdata:.3f}'
@@ -87,3 +105,4 @@ class ReceiverOperatingCharacteristic(Chart):
         
 
         self.add_trace(curve)
+        self.add_program(program)

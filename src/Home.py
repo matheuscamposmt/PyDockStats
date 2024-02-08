@@ -42,13 +42,6 @@ save_cp_container = st.sidebar.container(border=False)
 upload_cp_container = st.sidebar.container()
 
 
-with save_cp_container:
-        save_col, download_col = st.columns(2)
-        save_button = save_col.button("💾 Save progress", key="save", 
-                                        type='secondary', help="Save the current state of the app",
-                                        disabled= not programs_expanders.all_data_generated())
-
-
 with upload_cp_container:
 
     input_checkpoint = st.file_uploader("📁 Upload a checkpoint file ", type="pkl", key="input_checkpoint", 
@@ -60,19 +53,24 @@ with upload_cp_container:
         # load the checkpoint file
         import_dict = pickle.loads(input_checkpoint.read())
 
-        # create a new ProgramsExpanders object importing the data from the checkpoint
-        programs_expanders = ProgramsExpanders(import_dict)
-
-        # update the programs in cache
-        st.session_state['programs'] = programs_expanders.expanders
+        # update the expanders
+        programs_expanders.from_data_dict(import_dict)
 
         # reset the cached images paths
         st.session_state['paths'] = dict()
 
         programs_expanders.generate()
+
         st.success("✔️ Checkpoint loaded successfully.")
 
     
+        
+        
+with save_cp_container:
+        save_col, download_col = st.columns(2)
+        save_button = save_col.button("💾 Save progress", key="save", 
+                                        type='secondary', help="Save the current state of the app",
+                                        disabled= not programs_expanders.all_data_generated())
 
 st.subheader("Programs")
 # program name input
