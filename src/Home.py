@@ -8,7 +8,6 @@ import components.info as info
 from components.expander import ProgramsExpanders
 from components.charts import Predictiveness, ReceiverOperatingCharacteristic
 from utils.saving import EmailSender, FigureDownloader
-from streamlit_option_menu import option_menu
 
 
 
