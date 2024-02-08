@@ -9,9 +9,6 @@ from components.expander import ProgramsExpanders
 from components.charts import Predictiveness, ReceiverOperatingCharacteristic
 from utils.saving import EmailSender, FigureDownloader
 
-DIR = path.Path(__file__).abspath()
-sys.path.append(DIR.parent.parent)
-
 
 st.set_page_config(
     page_title="Home • PyDockStats",
