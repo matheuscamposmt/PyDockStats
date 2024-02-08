@@ -1,7 +1,7 @@
 import streamlit as st
 
 def intro():
-    st.image('src/assets/logo.png', width=250)
+    st.image('./src/assets/logo.png', width=250)
     st.title("PyDockStats")
     st.subheader("A Python tool for Virtual Screening performance analysis")
 
