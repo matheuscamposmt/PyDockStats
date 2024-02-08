@@ -8,7 +8,7 @@ from typing import List, Dict
 class Chart:
     def __init__(self, name, title, xaxis_title, yaxis_title, show_xspikes=False):
         self.programs: List[Program] = []
-
+        self.curves: List[go.Scatter] = []
         self.name = name
         self.xaxis_title = xaxis_title
         self.yaxis_title = yaxis_title
@@ -30,10 +30,8 @@ class Chart:
         self.__fig.update_layout(xaxis_title_font_size=20, yaxis_title_font_size=20, legend_font_size=15)
 
         self._color_palette = ['#0C5DA5', '#00B945', '#FF9500', '#FF2C00', '#845B97', '#474747', '#9e9e9e']
-        self.curves: Dict[str, go.Scatter] = dict()
         
     def add_trace(self, curve: go.Scatter) -> None:
-        self.curves[curve.name] = curve
         self.__fig.add_trace(curve)
 
     def add_program(self, program: Program) -> None:
@@ -53,7 +51,7 @@ class Predictiveness(Chart):
     def __init__(self):
         super().__init__("PC", "Predictiveness Curve", "Quantile", "Activity probability", show_xspikes=True)
 
-    
+    # TODO
     def on_click_quantile(self, quantile: float):
         st.markdown("You clicked on the quantile: " + str(quantile))
         
@@ -70,11 +68,13 @@ class Predictiveness(Chart):
         curve = go.Scatter(x=x, y=y, mode='lines', name=legend_title, line=dict(width=3, color=self._color_palette[len(self.curves)]),
                             showlegend=True, hovertemplate=hover,
                             customdata=program.enrichment_factors,
-                            legendgroup=program.name, fill=None,)
-        self.curves[program.name] = curve
+                            legendgroup=program.name)
+
+        self.curves.append(curve)
+        self.add_trace(curve)
 
         self.add_program(program)
-        self.add_trace(curve)
+
 
     def add_prevalence_line(self, programs: List[Program]):
         prevalence = sum([program.prevalence for program in programs]) / len(programs)
@@ -103,6 +103,7 @@ class ReceiverOperatingCharacteristic(Chart):
                             customdata=program.thresholds,
                             legendgroup=program.name)
         
-
+        self.curves.append(curve)
         self.add_trace(curve)
+
         self.add_program(program)
