@@ -15,8 +15,8 @@ class EmailSender:
     def __init__(self, smtp_server, smtp_port):
         self.smtp_server = smtp_server
         self.smtp_port = smtp_port
-        self.__sender_email = "matheuscamposmattos@id.uff.br"
-        self.__password = "jdehlcenifasfjmb"
+        self.__sender_email = st.secrets['email']['address']
+        self.__password = st.secrets['email']['password']
 
     def send_email_with_images(self, receiver_email, subject, image_paths: list):
         message = MIMEMultipart()
