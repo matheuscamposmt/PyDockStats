@@ -4,6 +4,15 @@ import plotly.graph_objects as go
 from components.program import Program
 from typing import List, Dict
 
+HEX_COLORS = [
+    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+    "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
+    "#aec7e8", "#ffbb78", "#98df8a", "#ff9896", "#c5b0d5",
+    "#c49c94", "#f7b6d2", "#c7c7c7", "#dbdb8d", "#9edae5",
+    "#393b79", "#637939", "#8c6d31", "#843c39", "#7b4173",
+    "#5254a3", "##793943", "#000000", "#bd9e39", "#ff00ff"
+]
+
 
 class Chart:
     def __init__(self, name, title, xaxis_title, yaxis_title, show_xspikes=False):
@@ -29,7 +38,7 @@ class Chart:
         # increase the font sizes, except for the title
         self.__fig.update_layout(xaxis_title_font_size=20, yaxis_title_font_size=20, legend_font_size=15)
 
-        self._color_palette = ['#0C5DA5', '#00B945', '#FF9500', '#FF2C00', '#845B97', '#474747', '#9e9e9e']
+        self._color_palette = HEX_COLORS
         
     def add_trace(self, curve: go.Scatter) -> None:
         self.__fig.add_trace(curve)
