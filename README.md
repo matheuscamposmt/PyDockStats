@@ -1,80 +1,60 @@
-# About PyDockStats
+
+# PyDockStats - Web Application
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/molmodcs/roc-auc-pc/blob/main/LICENSE)
+![2024-04-30-20-16-09](https://github.com/matheuscamposmt/PyDockStats/assets/69912320/5114b692-dfec-4ad9-bf7a-e7cc96c179ba)
 
-PyDockStats is an easy and versatil Python tool that builds [ROC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) (Receiver operating characteristic) and [Predictiveness Curve](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-015-0100-8) curves.
+[PyDockStats](https://pydockstats.streamlit.app/) is an easy-to-use Python tool designed to analyze and visualize the performance of Virtual Screening programs in the context of drug discovery and development. It focuses on building [ROC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) (Receiver Operating Characteristic) and [Predictiveness Curve](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-015-0100-8) curves to assess the predictive power of scoring functions in separating true positives from false positives.
 
-The script starts creating a logistic regression model from the data, and with the predictions it creates the graphical plots. ROC curve is a graphical plot that describes the performance of a binary classifier by plotting the relationship between the true positive rate and the false positive rate.
-PC (Predictiveness Curve) curve is a graphical plot that measures the ability of a Virtual Screening program to separate the data in true positives (true active) and false positives (decoys) by plotting a [Cumulative Distribution Function (CDF)](https://en.wikipedia.org/wiki/Cumulative_distribution_function). Therefore, the tool is useful when verifying Virtual Screening programs' performance and gaining more confidence when making inferences.
+### Features
 
-## Getting Started
+- **ROC Curve Analysis**: PyDockStats creates a logistic regression model from the data to generate ROC curves. These curves illustrate the trade-offs between the True Positive Rate (TPR) and False Positive Rate (FPR) at various threshold settings. The Area Under the Curve (AUC) provides a quantitative measure of the scoring function's ability to distinguish true positives from false positives.
+<p align="center">
+  <img src="https://github.com/matheuscamposmt/PyDockStats/assets/69912320/599e6ee2-fedc-4d9b-9174-1168373374fc" width="800" class="center">
+</p>
 
-The development version can be installed directly from github via `git`:
 
-```git clone https://github.com/molmodcs/PyDockStats.git```
+- **Predictiveness Curve (PC) Analysis**: In addition to ROC curves, PyDockStats constructs Predictiveness Curves to evaluate the performance of Virtual Screening programs. These curves quantify and compare the predictive power of scoring functions, aiding in the selection of an optimal score threshold for prospective virtual screening.
+<p align="center">
+  <img src="https://github.com/matheuscamposmt/PyDockStats/assets/69912320/20b2f2d1-0a13-4a63-b6a6-b3ce5a38b91f" width="800" class="center">
+</p>
 
-The source is the "pydockstats.py" which generates the Predictiveness curves and ROC curves given a dataset of decoys and ligands with their respectives IDs or names, docking scores (decimals separated by dot (.) ) and their activities (0 or 1). The script is compatible with any number of programs. The input data (.csv, .xlsx, .ods) must be separated into columns for each docking program:
+### How to Use
 
-|id_program1|scores_program1|activity_program1|id_program2|scores_program2|activity_program2|
-|-----------|---------------|-----------------|-----------|---------------|-----------------|
-|molecule1  |-12.3          |0                |molecule4  |3.6            |0                |
+The web-app is available [here](https://pydockstats.streamlit.app/)
 
-Example:
+Using PyDockStats is straightforward and intuitive. Follow these steps to analyze the performance of Virtual Screening programs:
 
-|surf_id                                                                                    |surf_scores|surf_actives|icm_id   |icm_scores|icm_actives|vina_id  |vina_scores|vina_actives|
-|-------------------------------------------------------------------------------------------|-----------|------------|---------|----------|-----------|---------|-----------|------------|
-|decoy1565                                                                                  |16.76      |0           |decoy428 |-54.926393|0          |decoy564 |-13.9      |0           |
-|ligand83                                                                                   |16.56      |1           |decoy564 |-53.988434|0          |decoy2783|-13.8      |0           |
-|ligand82                                                                                   |16.56      |1           |ligand16 |-52.584761|1          |decoy298 |-13.7      |0           |
-|ligand13                                                                                   |16.42      |1           |decoy2783|-52.546666|0          |ligand18 |-13.4      |1           |
-|decoy564                                                                                   |16.35      |0           |ligand43 |-50.703975|1          |ligand16 |-13.3      |1           |
-|decoy309                                                                                   |16.07      |0           |decoy2539|-50.534748|0          |decoy429 |-13.2      |0           |
-|ligand70                                                                                   |15.82      |1           |ligand66 |-50.454789|1          |ligand19 |-13.1      |1           |
-|ligand81                                                                                   |15.7       |1           |ligand53 |-50.225887|1          |ligand82 |-13.1      |1           |
-|ligand8                                                                                    |15.55      |1           |ligand9  |-49.668177|1          |ligand21 |-13.1      |1           |
-|decoy541                                                                                   |15.5       |0           |ligand70 |-48.878551|1          |decoy526 |-13.1      |0           |
+1. **Add Programs**: Start by clicking the ➕ Add Program button below. This action creates a new expander for each program you want to analyze. Each expander will be labeled with the name of the program.
 
-OBS: The molecules of the programs doesn't need to be align, because the algorithm sort them for each program and the alignment will be lost.
+2. **Input Data**: Within each program expander, paste the scores of the ligands and decoys into the data editor. You can add as many rows as needed and preview the data in a table format.
 
-### Prerequisites
+3. **Generate Curves**: After adding the scores, click on the ✨ Generate button to create ROC and PC curves for each program. PyDockStats will utilize a logistic regression model to analyze the relationship between the molecule score and activity, distinguishing True Positives from False Positives.
 
-[matplotlib](https://matplotlib.org/) (3.5.2)<br/>
-`pip install matplotlib`<br/>
+4. **Visualize Results**: The ROC and PC curves will be displayed on the same page for easy comparison. You can download the figures individually using the 📥 Download button located below each figure.
 
-[NumPy](https://numpy.org/) (1.22.3)<br/>
-`pip install numpy`<br/>
+5. **Email Sharing**: If needed, you can send the figures to your email address using the option provided at the bottom of the page.
 
-[pandas](https://pandas.pydata.org/) (1.4.2)<br/>
-`pip install pandas`<br/>
+6. **Save Progress**: To save your progress, click on the 💾 Save Progress button on the sidebar. This action generates a checkpoint file (.pkl) that you can download. Later, you can upload the checkpoint file using the 📁 Upload button, allowing you to load your progress and continue your analysis seamlessly from where you left off.
 
-[scikit-learn](https://scikit-learn.org/stable/) (1.1.0)<br/>
-`pip install scikit-learn`<br/>
+### Applications
 
-## Usage
+- **Virtual Screening Program Evaluation**: PyDockStats is invaluable for assessing the performance of Virtual Screening programs. By comparing ROC and Predictiveness Curves, researchers can evaluate the efficacy of different scoring functions and make informed decisions about prospective virtual screening.
 
-The code runs at the command line:</br>
+- **Decision Support in Drug Discovery**: Researchers can use PyDockStats to determine cutoff values and prioritize compounds for experimental testing. This enhances the efficiency of drug discovery programs by focusing resources on the most promising candidates.
+<p align="center">
+  <img src="https://github.com/matheuscamposmt/PyDockStats/assets/69912320/49722e1f-83a5-4200-8d10-b3caffe04992" width="800" class="center">
+</p>
 
-`python pydockstats.py -f data_file`
+### Support
 
-There are optional arguments such as:
-
--p or --programs: names of the programs
--o or --output: output image filename
-
-If not specified the script will use the default parameters.
-
-For example:
-
->`python pydockstats.py -f input_data.csv -p gold,vina,dockthor -o out.png`
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+For any questions, issues, or feature requests, please [open an issue](https://github.com/matheuscamposmt/PyDockStats/issues) on GitHub. We welcome contributions and feedback from the community to improve PyDockStats and make it even more valuable for drug discovery research.
 
 ## Authors
-
-* **Matheus Campos de Mattos** - (https://github.com/matheuscamposmtt)
+* **Matheus C. de Mattos** - (https://github.com/matheuscamposmtt)
 * **Luciano T. Costa** - (http://www.molmodcs.uff.br/) or (https://github.com/molmodcs)
+* **Marcus V. H. Faria**
+* **Leonardo Federico**
 
 See also the list of [contributors](https://github.com/molmodcs/roc-auc-pc/blob/3936564b42f2626d41962c3b16ef074d166d8582/contributors) who participated in this project.
 
