@@ -60,7 +60,7 @@ See also the list of [contributors](https://github.com/molmodcs/roc-auc-pc/blob/
 
 ## License
 
-This project is licensed under the GNU License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GNU License - see the [License tab](https://github.com/matheuscamposmt/PyDockStats?tab=License-1-ov-file) for details
 
 * PyDockStats version 1.0 (746241f) compiled by 'matheuscamposmattos@id.uff.br' on 2022-07-25
 
