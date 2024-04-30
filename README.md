@@ -39,7 +39,7 @@ Using PyDockStats is straightforward and intuitive. Follow these steps to analyz
 
 ### Applications
 
-- **Virtual Screening Program Evaluation**: PyDockStats is invaluable for assessing the performance of Virtual Screening programs. By comparing ROC and Predictiveness Curves, researchers can evaluate the efficacy of different scoring functions and make informed decisions about prospective virtual screening.
+- **Virtual Screening Program Evaluation**: By comparing ROC and Predictiveness Curves, researchers can evaluate the efficacy of different scoring functions and make informed decisions about prospective virtual screening.
 
 - **Decision Support in Drug Discovery**: Researchers can use PyDockStats to determine cutoff values and prioritize compounds for experimental testing. This enhances the efficiency of drug discovery programs by focusing resources on the most promising candidates.
 <p align="center">
