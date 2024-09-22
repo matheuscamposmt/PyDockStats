@@ -57,11 +57,6 @@ def calculate_enrichment_factor(y_true, y_pred, top_percentage=0.05):
     # Calcula o número de ativos na porcentagem superior
     top_actives = np.sum(sorted_y_true[:cutoff])
 
-    print("Top Actives:", top_actives)
-    print("Total Actives:", np.sum(y_true))
-    print("Cutoff:", cutoff)
-    print("Total:", len(y_true))
-
     # Calcula o EF
     ef = (top_actives / np.sum(y_true)) / (cutoff / len(y_true))
 

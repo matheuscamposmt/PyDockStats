@@ -69,9 +69,6 @@ def calculate_curves(program_name, scores, activity):
 
     # Step 4: Calculate BEDROC score
     bedroc = bedroc_score(activity, predictions)
-    print("Sorted Activity:", activity)
-    print("Sorted Predictions:", predictions)
-    print("BEDROC:", bedroc)
 
     # Step 5: Prepare ROC data
     roc_data = {

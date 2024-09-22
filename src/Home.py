@@ -152,7 +152,7 @@ if programs_expanders.all_data_generated():
             )
             info.roc_interpretation_help()
             
-            with st.expander("### BEDROC", icon="ℹ️"):
+            with st.expander("### BEDROC Metric"):
                 st.markdown(
                     """
                     ### BEDROC (Boltzmann-Enhanced Discrimination of ROC) Metric
