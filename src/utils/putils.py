@@ -76,27 +76,47 @@ def save_plots(pc_data, roc_data, names, save_path="."):
 
     return [fig_path, roc_path]
 
-# Function to generate artificial scores for ligands and decoys
-def generate_artificial_scores(num_ligands, num_decoys):
-    # Generate random scores for ligands and decoys (between 0 and 1)
+# Function to generate realistic artificial docking scores for ligands and decoys
+def generate_artificial_scores(max_points: int = 1000):
+    """
+    Generate artificial docking scores that simulate the behavior of real-world docking data.
 
-    # ligand scores between 0.5 and 1
-    ligand_scores = np.random.uniform(0.5, 1, num_ligands)
+    Args:
+        num_ligands: Number of ligands (actives) to generate.
+        num_decoys: Number of decoys (inactive compounds) to generate.
 
-    # decoy scores between 0 and 0.5
-    decoy_scores = np.random.uniform(0, 0.5, num_decoys)
+    Returns:
+        A dictionary containing the generated scores for ligands and decoys.
+    """
+    # random number of decoys (make it bigger than 0.5)
+    frac_decoys = 0.5 + np.random.rand() * 0.3
 
-    ligand_labels = np.ones(num_ligands)
-    decoy_labels = np.zeros(num_decoys)
+    num_decoys = int(max_points * frac_decoys)  # Random number of decoys
+    num_ligands = max_points - num_decoys  # Remaining points are ligands
 
-    combined_ligand_data = np.column_stack((ligand_scores, ligand_labels))
-    combined_decoy_data = np.column_stack((decoy_scores, decoy_labels))
+    # Generate random docking scores for decoys and ligands
+    # Decoys generally have worse (higher) scores than ligands, so we adjust the beta distribution
+    decoys = -1 * (np.random.beta(2, 5, num_decoys) * 10 + np.random.normal(0, 0.5, num_decoys))  # Shift to negative range
+    ligands = -1 * (np.random.beta(5, 2, num_ligands) * 8 + np.random.normal(0, 0.3, num_ligands))  # Better (lower) scores
 
-    # save to csv with pandas
-    df_ligands = pd.DataFrame(combined_ligand_data, columns=['scores', 'activity'])
-    df_decoys = pd.DataFrame(combined_decoy_data, columns=['scores', 'activity'])
+    # add powerful noise
+    decoys = decoys + np.random.normal(0, 2, num_decoys)
+    ligands = ligands + np.random.normal(0, 2, num_ligands)
 
-    df_ligands.to_csv('ligands.csv', index=False, header=True)
-    df_decoys.to_csv('decoys.csv', index=False, header=True)
+    # Introduce a few outliers (extremely good or bad scores)
+    frac_outliers = 0.01 + np.random.rand() * 0.05  # Fraction of outliers
+    n_outliers = int(max_points * frac_outliers)  # Number of outliers
+    ligand_outliers = -1 * np.random.uniform(0, 5, n_outliers)  # Very low (good) scores for a few ligands
+    ligands[:n_outliers] = ligand_outliers
 
-    return True
+    decoy_outliers = -1 * np.random.uniform(10, 20, n_outliers)  # Very high (bad) scores for a few decoys
+    decoys[:n_outliers] = decoy_outliers
+
+    # Create a DataFrame for easier manipulation and realistic output format
+    data = {
+        "decoys": decoys,
+        "ligands": ligands
+    }
+
+
+    return data

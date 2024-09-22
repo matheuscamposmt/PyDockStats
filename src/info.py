@@ -25,6 +25,11 @@ def about():
                     the data into true positives (true active) and false positives (decoys) and  (1) quantify and compare the predictive
                     power of scoring functions above a given score quantile; (2) define a score threshold for prospective virtual
                     screening, in order to select an optimal number of compounds to be tested experimentally in a drug discovery program.
+
+                    - **Precision-Recall curve** is a graphical plot that describes the trade-off between the precision and the recall of a binary classifier.
+                    The precision is the ratio of the True Positives to the sum of True Positives and False Positives, i.e the probability of a compound being active given that the model predicted it as active.
+                    The recall is the ratio of the True Positives to the sum of True Positives and False Negatives, i.e the probability of a compound being predicted as active given that it is active.
+                    The Precision-Recall curve is useful when the dataset is imbalanced, i.e the number of actives is much smaller than the number of decoys.
                     
                     Therefore, the tool is useful when verifying Virtual Screening programs performance and can be used to compare different programs.
                     
@@ -36,6 +41,8 @@ def general_help():
         st.markdown("""
                     With PyDockStats you can add as many programs as you want using the **➕ Add Program** button below. The button will create a new expander with the name of the program. 
                     In each program expander you can paste the scores of the ligands and decoys in the data editor, being able to add as many rows as you want and preview the data in a table.
+
+                    You can also generate artificial scores for ligands and decoys using the **🧪 Generate fake data** button. This will create a new expander with the name **Artificial Scores**.
                     
                     - After adding the scores, you can click on the **✨ Generate** button to create the ROC and PC curves for each program.
 
@@ -65,4 +72,13 @@ def roc_interpretation_help():
                     and the ROC curve is a plot of the TPR against the FPR. The ROC curve has the ability to visualize the trade-offs between the Sensitivity (TPR) and the Specificity (1 - FPR) as the discrimination threshold is varied. 
                     In other wordswe want to maximize Sensitivity and the Specificity at the same time, but in practice this is not totally possible, so the ROC curve is a way to find the best configuration that 
                     equilibrate both measures. Also, the **Area Under** the ROC **Curve** (AUC) is the overall measure of the ability of a scoring function to distinguish between true positives (true active) and false positives (decoys).
+                    """)
+        
+def precision_recall_interpretation_help():
+    with st.expander("🤔 How to interpret the curve?"):
+        st.markdown("""
+                    The Precision-Recall curve is a plot of the Precision against the Recall. The Precision is the ratio of the True Positives to the sum of True Positives and False Positives, i.e
+                    the probability of a compound being active given that the model predicted it as active. Maximizing the precision means that the model is more selective in predicting actives.
+                    The Recall is the ratio of the True Positives to the sum of True Positives and False Negatives, i.e the probability of a compound being predicted as active given that it is active.
+                    Maximizing the recall means that the model is more sensitive in predicting actives. The Precision-Recall curve is useful when the dataset is imbalanced, i.e the number of actives is much smaller than the number of decoys.
                     """)

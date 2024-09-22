@@ -1,5 +1,4 @@
 import streamlit as st
-from model.pydockstats import calculate_curves
 import plotly.graph_objects as go
 from components.program import Program
 from typing import List, Dict
@@ -60,14 +59,6 @@ class Predictiveness(Chart):
     def __init__(self):
         super().__init__("PC", "Predictiveness Curve", "Quantile", "Activity probability", show_xspikes=True)
 
-    # TODO
-    def on_click_quantile(self, quantile: float):
-        st.markdown("You clicked on the quantile: " + str(quantile))
-        
-        for program in self.programs:
-            st.metric(label=f"({program.name})", value=program.enrichment_factors[program.quantiles.index(quantile)], delta=0.01, delta_color='normal')
-
-        
     def add_plot(self, program: Program):
         x, y = program.quantiles, program.probabilities
 
@@ -94,7 +85,7 @@ class Predictiveness(Chart):
 
 class ReceiverOperatingCharacteristic(Chart):
     def __init__(self):
-        super().__init__("ROC", "Receiver Operating Characteristic", "False Positive Rate", "True Positive Rate")        
+        super().__init__("ROC", "Receiver Operating Characteristic (ROC)", "False Positive Rate", "True Positive Rate")        
         # add a diagonal line
         random_line = go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name='Random', line=dict(width=1, color='red', dash='dash'),
                                  showlegend=True, hoverinfo='skip')
@@ -112,6 +103,27 @@ class ReceiverOperatingCharacteristic(Chart):
                             customdata=program.thresholds,
                             legendgroup=program.name)
         
+        self.curves.append(curve)
+        self.add_trace(curve)
+
+        self.add_program(program)
+
+
+#  create precision-recall curve
+class PrecisionRecall(Chart):
+    def __init__(self):
+        super().__init__("Precision-Recall", "Precision-Recall Curve", "Recall", "Precision")
+
+    def add_plot(self, program: Program):
+        x, y = program.recall, program.precision
+
+        legend_title = f"{program.name}"
+        hover = 'Recall: %{x:.3f}<br>Precision: %{y:.3f}<br>Threshold=%{customdata:.3f}'
+
+        curve = go.Scatter(x=x, y=y, mode='lines', name=legend_title, line=dict(width=3, color=self._color_palette[len(self.curves)]),
+                            showlegend=True, hovertemplate=hover, 
+                            customdata=program.pr_thresholds,
+                            legendgroup=program.name)
         self.curves.append(curve)
         self.add_trace(curve)
 

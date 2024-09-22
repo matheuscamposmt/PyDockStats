@@ -16,6 +16,11 @@ class Program:
         self.__tpr = None
         self.__auc = None
         self.__thresholds = None
+        self.__bedroc = None
+
+        self.__recall = None
+        self.__precision = None
+        self.__pr_thresholds = None
 
         self.data_generated = False
         self.data_inputted = False
@@ -49,12 +54,27 @@ class Program:
         return self.__auc
     
     @property
+    def bedroc(self):
+        return self.__bedroc
+
+    @property
+    def recall(self):
+        return self.__recall
+    @property
+    def precision(self):
+        return self.__precision
+    
+    @property
     def thresholds(self):
         return self.__thresholds
     
-    def set_data(self, ligands, decoys):
-        self.__ligands = ligands
-        self.__decoys = decoys
+    @property
+    def pr_thresholds(self):
+        return self.__pr_thresholds
+    
+    def set_data(self, ligands_score, decoys_score):
+        self.__ligands = pd.DataFrame(data=ligands_score, columns=['score'])
+        self.__decoys = pd.DataFrame(data=decoys_score, columns=['score'])
         self.data_inputted = True
 
     @property
@@ -73,11 +93,15 @@ class Program:
         ligands_copy['activity'] = 1
         decoys_copy['activity'] = 0
 
-        df = pd.concat([ligands_copy, decoys_copy], ignore_index=True).sample(frac=1)
+        df = pd.concat([ligands_copy, decoys_copy], ignore_index=True)
 
         scores, activity = preprocess_data(df)
 
-        pc, roc = calculate_curves(self.name, scores, activity)
+        curves = calculate_curves(self.name, scores, activity)
+        
+        pc = curves['pc']
+        roc = curves['roc']
+        precision_recall = curves['precision_recall']
 
         self.__quantiles = pc['x']
         self.__probabilities = pc['y']
@@ -88,6 +112,11 @@ class Program:
         self.__tpr = roc['y']
         self.__auc = roc['auc']
         self.__thresholds = roc['thresholds']
+        self.__bedroc = roc['bedroc']
+
+        self.__recall = precision_recall['x']
+        self.__precision = precision_recall['y']
+        self.__pr_thresholds = precision_recall['thresholds']
 
         self.data_generated = True
 

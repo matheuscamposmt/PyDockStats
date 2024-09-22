@@ -61,7 +61,7 @@ class ProgramExpander:
         ligands_df['score'] = ligands_df['score'].apply(lambda x: float(x.replace(',', '.')) if isinstance(x, str) else x)
         decoys_df['score'] = decoys_df['score'].apply(lambda x: float(x.replace(',', '.')) if isinstance(x, str) else x)
 
-        self.__program.set_data(ligands_df, decoys_df)
+        self.__program.set_data(ligands_df['score'], decoys_df['score'])
     
     def data_inputted(self) -> bool:
         return self.__program.data_inputted
