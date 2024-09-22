@@ -65,7 +65,7 @@ def calculate_curves(program_name, scores, activity):
     # Step 3: Generate percentile data for enrichment factors
     pc_x = generate_percentiles(predictions[sorted_indices[::-1]])
     n_actives = sum(activity)
-    enrichment_factors = [calculate_enrichment_factor(activity, predictions, x) for x in pc_x]
+    enrichment_factors = [calculate_enrichment_factor(activity, predictions, 1-x) for x in pc_x]
 
     # Step 4: Calculate BEDROC score
     bedroc = bedroc_score(activity, predictions)
