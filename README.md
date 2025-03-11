@@ -6,6 +6,8 @@
 
 [PyDockStats](https://pydockstats.streamlit.app/) is an easy-to-use Python tool designed to analyze and visualize the performance of Virtual Screening programs in the context of drug discovery and development. It focuses on building [ROC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) (Receiver Operating Characteristic) and [Predictiveness Curve](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-015-0100-8) curves to assess the predictive power of scoring functions in separating true positives from false positives.
 
+**The command-line version version of PyDockStats** https://github.com/molmodcs/PyDockStats
+
 ### Features
 
 - **ROC Curve Analysis**: PyDockStats creates a logistic regression model from the data to generate ROC curves. These curves illustrate the trade-offs between the True Positive Rate (TPR) and False Positive Rate (FPR) at various threshold settings. The Area Under the Curve (AUC) provides a quantitative measure of the scoring function's ability to distinguish true positives from false positives.
